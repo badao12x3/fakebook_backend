@@ -3,7 +3,7 @@ const {GENDER_SECRET} = require("../constants/constants");
 const {GENDER_FEMALE} = require("../constants/constants");
 const {GENDER_MALE} = require("../constants/constants");
 
-const userSchema = new mongoose.Schema({
+const accountSchema = new mongoose.Schema({
     name: {
         type: String,
         required: false,
@@ -81,15 +81,15 @@ const userSchema = new mongoose.Schema({
 
 });
 
-userSchema.index({phoneNumber: 'text'});
-userSchema.set('timestamps', true);
+accountSchema.index({phoneNumber: 'text'});
+accountSchema.set('timestamps', true);
 
-const User = mongoose.model('User', userSchema);
-User.prototype.getDefaultAvatar = () => {
+const Account = mongoose.model('Account', accountSchema);
+Account.prototype.getDefaultAvatar = () => {
     return 'https://res.cloudinary.com/it4895/image/upload/v1607791757/it4895/avatars/default-avatar_jklwc7.jpg';
 }
-User.prototype.getAvatar = () => {
+Account.prototype.getAvatar = () => {
     if(!this.avatar) return 'https://res.cloudinary.com/it4895/image/upload/v1607791757/it4895/avatars/default-avatar_jklwc7.jpg';
     return this.avatar.url;
 }
-module.exports = User;
+module.exports = Account;
