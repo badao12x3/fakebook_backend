@@ -27,7 +27,10 @@
     "path": "^0.12.7",
     "socket.io": "^4.1.2",
     "url": "^0.11.0",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "cloudinary": "^1.23.0",
+    "streamifier": "^0.1.1",
+    "express-async-handler": "^1.2.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.7"
