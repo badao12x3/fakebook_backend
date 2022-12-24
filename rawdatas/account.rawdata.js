@@ -1,5 +1,7 @@
+// fix cứng _id phục vụ mục đích truy vấn các thứ liên quan đến count dễ dàng
 const accounts = [
     {
+        "_id": "63a6854c92f5e81f48ae4e51",
         "name": "Thomasin Janauschek",
         "password": "fccdmIaGc7K8",
         "phoneNumber": "0490904992",
@@ -27,12 +29,13 @@ const accounts = [
             "latitude": 50.0022253,
             "longtitude": 51.0022253
         },
-        "blockedAccounts": [],
+        "blockedAccounts": ["63a6854c92f5e81f48ae4e53"],
         "friends": [],
         "friendRequestReceived": [],
         "friendRequestSent": []
     },
     {
+        "_id": "63a6854c92f5e81f48ae4e52",
         "name": "Valeria Kippax",
         "password": "gtXIytpmJQ0D",
         "phoneNumber": "0185937905",
@@ -66,6 +69,7 @@ const accounts = [
         "friendRequestSent": []
     },
     {
+        "_id": "63a6854c92f5e81f48ae4e53",
         "name": "Cassi Siene",
         "password": "uSbCoRMsR",
         "phoneNumber": "0422315213",
@@ -99,6 +103,7 @@ const accounts = [
         "friendRequestSent": []
     },
     {
+        "_id": "63a6854c92f5e81f48ae4e54",
         "name": "Ashton Spacie",
         "password": "xHKssk4o0",
         "phoneNumber": "0725626146",
@@ -132,6 +137,7 @@ const accounts = [
         "friendRequestSent": []
     },
     {
+        "_id": "63a6854c92f5e81f48ae4e55",
         "name": "Elberta Bice",
         "password": "DhZX1P9FV8FR",
         "phoneNumber": "0204941457",
