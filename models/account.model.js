@@ -21,11 +21,13 @@ const accountSchema = new mongoose.Schema({
         required: true
     },
     avatar: {
+        filename: String,
         url: String,
         publicId: String,
         require: false
     },
     coverImage: {
+        filename: String,
         url: String,
         publicId: String,
         require: false
@@ -77,7 +79,34 @@ const accountSchema = new mongoose.Schema({
         latitude: String,
         longitude: String,
         require: false
-    }
+    },
+    blockedAccounts: [{
+        account: {type: mongoose.Schema.Types.ObjectId, ref: 'accounts'},
+        createdAt: {type: Date}
+    }],
+    friends: [{
+        friend: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'accounts',
+        },
+        createdAt: {
+            type: Date
+        }
+    }],
+    friendRequestReceived: [{
+        fromUser: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'accounts',
+        },
+        lastCreated: {
+            type: Date,
+            default: Date.now
+        },
+    }],
+    friendRequestSent: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'accounts',
+    }],
 
 });
 
