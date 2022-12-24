@@ -106,6 +106,13 @@ const responseError = {
             message: "Action has been done previously by this user"
         }
     },
+    POST_IS_NOT_EXISTED: {
+        statusCode: 400,
+        body: {
+            code: "9992",
+            message: "Post is not existed"
+        }
+    },
     NO_DATA: {
         statusCode: 400,
         body: {

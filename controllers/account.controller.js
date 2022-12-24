@@ -30,7 +30,7 @@ accountsController.login = expressAsyncHandler(async (req, res) => {
     }, JWT_SECRET,{expiresIn: "30d"});
     account.online = true;
     account.token = token;
-    account.avatar.url = account.getDefaultAvatar();
+    account.avatar.url = account.getAvatar();
     account.save();
     res.json({
         code: responseError.OK.statusCode,

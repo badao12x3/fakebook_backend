@@ -1,8 +1,8 @@
 const jwt = require('jsonwebtoken');
 const expressAsyncHandler = require("express-async-handler");
 
-const User = require('../models/account.model');
-const {resCode, response} = require('../constants/response_code');
+const Account = require('../models/account.model');
+const {setAndSendResponse, responseError} = require('../constants/response_code');
 const {JWT_SECRET} = require("../constants/constants");
 
 const authToken = expressAsyncHandler(async (req, res, next) => {
@@ -10,18 +10,20 @@ const authToken = expressAsyncHandler(async (req, res, next) => {
     if (req.headers.authorization) {
         token = req.headers.authorization;
     }else{
-        token = req.query.token;
+        token = req.body.token;
     }
-    try {
-        const decoded = jwt.verify(token, JWT_SECRET);
-    } catch (error) {
-        return response(res,401);
-    }
-    req.user = await User.findById(decoded.id).select("-password");
-    req.decoded = decoded;
-    next(); // next để gọi tiếp hàm sau
+
     if (!token) {
-        return response(res, 402);
+        return setAndSendResponse(res, responseError.NOT_AUTHORIZED_NO_TOKEN);
+    }else{
+        try {
+            const decoded = jwt.verify(token, JWT_SECRET);
+            req.account = await Account.findById(decoded.account_id).select("-password");
+            next(); // next để gọi tiếp hàm sau
+        } catch (error) {
+            return setAndSendResponse(res, responseError.NOT_AUTHORIZED_TOKEN_FAILED);
+        }
+
     }
 })
 

@@ -29,7 +29,7 @@ const accounts = [
             "latitude": 50.0022253,
             "longtitude": 51.0022253
         },
-        "blockedAccounts": ["63a6854c92f5e81f48ae4e53"],
+        "blockedAccounts": [{account: "63a6854c92f5e81f48ae4e53", createdAt: Date.now()}],
         "friends": [],
         "friendRequestReceived": [],
         "friendRequestSent": []

@@ -113,12 +113,16 @@ const accountSchema = new mongoose.Schema({
 accountSchema.index({phoneNumber: 'text'});
 accountSchema.set('timestamps', true);
 
-const Account = mongoose.model('Account', accountSchema);
-Account.prototype.getDefaultAvatar = () => {
+// Do not declare methods using ES6 arrow functions (=>). Arrow functions explicitly prevent binding this, so your method will not have access to the document ...
+accountSchema.methods.getDefaultAvatar = function () {
     return 'https://res.cloudinary.com/it4895/image/upload/v1607791757/it4895/avatars/default-avatar_jklwc7.jpg';
 }
-Account.prototype.getAvatar = () => {
+accountSchema.methods.getAvatar = function () {
+    // console.log(this.avatar);
     if(!this.avatar) return 'https://res.cloudinary.com/it4895/image/upload/v1607791757/it4895/avatars/default-avatar_jklwc7.jpg';
     return this.avatar.url;
 }
+
+const Account = mongoose.model('Account', accountSchema);
+
 module.exports = Account;
