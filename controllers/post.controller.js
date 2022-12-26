@@ -27,8 +27,8 @@ postsController.get_post = expressAsyncHandler(async (req, res) => {
         let result = {
             id: post._id,
             described: post.described,
-            created: post.createdAt.getTime().toString(),
-            updatedAt: post.updatedAt.getTime().toString(),
+            createdAt: post.createdAt.toString(),
+            updatedAt: post.updatedAt.toString(),
             likes: post.likes,
             comments: post.comments,
             author: {
@@ -94,8 +94,8 @@ postsController.get_list_posts = expressAsyncHandler(async (req, res) => {
             return {
                 id: post._id,
                 described: post.described,
-                created: post.createdAt.getTime().toString(),
-                updatedAt: post.updatedAt.getTime().toString(),
+                createdAt: post.createdAt.toString(),
+                updatedAt: post.updatedAt.toString(),
                 likes: post.likes,
                 comments: post.comments,
                 author: {

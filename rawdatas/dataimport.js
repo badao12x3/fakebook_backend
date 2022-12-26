@@ -11,6 +11,7 @@ const Video = require('../models/video.model');
 
 const {posts,comments} = require("./post.rawdata");
 const accounts = require('./account.rawdata');
+const videos = require('./video.rawdata');
 
 importDataRouter.post('/removeAll', expressAsyncHandler(async (req, res) => {
     await Account.remove({});
@@ -47,4 +48,12 @@ importDataRouter.post('/comments', expressAsyncHandler(async (req, res) => {
     const importComments = await Comment.insertMany(comments);
     res.send({importComments});
 }));
+
+importDataRouter.post('/videos', expressAsyncHandler(async (req, res) => {
+    await Video.remove({});
+    const importVideos = await Video.insertMany(videos);
+    res.send({importVideos});
+}));
+
+
 module.exports = importDataRouter;
