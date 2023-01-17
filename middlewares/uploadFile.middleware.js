@@ -1,4 +1,5 @@
 const multer = require('multer');
+const {setAndSendResponse, responseError} = require('../constants/response_code');
 
 function fileFilter(req, file, cb){
     // console.log(file);
@@ -10,32 +11,24 @@ function fileFilter(req, file, cb){
     cb(error, false);
 }
 
-module.exports = (req, resp, next) => {
+module.exports = (req, res, next) => {
     const upload = multer( {fileFilter: fileFilter} )
         .fields([
             {name: 'image', maxCount: 4},
             {name: 'video', maxCount: 1}
         ]);
-    upload(req, resp, (error) => {
+    upload(req, res, (error) => {
         if(error){
+            console.log("ddaay nè")
             console.log(error);
             if(error.code === 'LIMIT_UNEXPECTED_FILE'){
                 // vượt quá 4 ảnh
-                return resp.json({
-                    code: '1008',
-                    message: "Maximum number of images"
-                });
+                return setAndSendResponse(res, responseError.MAXIMUM_NUMBER_OF_IMAGES);
             }
             if(error.code === 'WRONG_TYPE_FILE') {
-                return resp.json({
-                    code: '1003',
-                    message: "Parameter type is invalid"
-                });
+                return setAndSendResponse(res, responseError.PARAMETER_TYPE_IS_INVALID);
             }
-            resp.json({
-                code: '1007',
-                message: "Upload file failed"
-            });
+            setAndSendResponse(res,responseError.UPLOAD_FILE_FAILED);
         }else{
             next();
         }

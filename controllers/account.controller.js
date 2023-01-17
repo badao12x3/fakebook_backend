@@ -2,10 +2,15 @@ const express = require("express");
 const jwt = require('jsonwebtoken');
 const expressAsyncHandler = require("express-async-handler");
 
+// import model
 const Account = require('../models/account.model');
-const { responseError, setAndSendResponse } = require('../constants/response_code');
 
-const {isValidPassword,isPhoneNumber} = require('../validations/validateData');
+//import cloud storage
+const cloudinary = require('../config/cloudinaryConfig')
+
+const { responseError, setAndSendResponse, callRes } = require('../constants/response_code');
+
+const {isValidPassword,isPhoneNumber, isValidId, isValidName, checkLink} = require('../validations/validateData');
 const {JWT_SECRET} = require("../constants/constants");
 
 const accountsController = {};
@@ -67,5 +72,185 @@ accountsController.signup = expressAsyncHandler(async (req, res) => {
     }
 });
 
+accountsController.set_user_info = expressAsyncHandler( async (req, res) => {
+    const {username, description, city,country, link} = req.body;
+    const {account} = req;
+
+    // ko gửi thông tin gì lên
+	if(!username && !description && !city && 
+		!country && !link && !req.files){
+            console.log("ko gửi thông tin gì lên")
+            return setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
+        } 
+    // mô tả hơn 150 kí tự
+	if(description && description.length > 150) {
+        console.log("mô tả hơn 150 kí tự");
+        return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
+    }
+
+	// tài khoản đã bị khóa 
+	if(account.isBlocked)  {
+        console.log("tài khoản đã bị khóa");
+        return setAndSendResponse(res, responseError.NOT_ACCESS);
+    }
+
+	// tên sai định dạng
+	if(username && !isValidName(username)) {
+        console.log("tên sai định dạng");
+        return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
+    }
+    // tên sai định dạng
+    if (city && typeof city !== "string")
+        return callRes(res, responseError.PARAMETER_TYPE_IS_INVALID, 'city');
+    if (country && typeof country !== "string")
+        return callRes(res, responseError.PARAMETER_TYPE_IS_INVALID, 'country');
+    if (link ){
+        if( typeof link !== "string" )
+        return callRes(res, responseError.PARAMETER_TYPE_IS_INVALID, 'link');
+        if (!checkLink(link)) 
+        return callRes(res, responseError.PARAMETER_VALUE_IS_INVALID, 'link '+link+' banned');
+    }
+
+    if(username) account.name = username;
+	if(description) account.description = description;
+	if(city) account.city = city;
+	if(country) account.country = country;
+	if(link) account.link = link;
+
+    // upload avatar
+	if(req.files && req.files.avatar){
+		if(account.avatar && account.avatar.url !== 'https://res.cloudinary.com/it4895/image/upload/v1607791757/it4895/avatars/default-avatar_jklwc7.jpg'){
+			//xóa avatar cũ
+			cloudinary.removeImg(account.avatar.publicId);
+		}
+		// upload avatar mới
+		try{
+			let data = await cloudinary.uploads(req.files.avatar[0]);
+			account.avatar = data;
+		}catch (err){
+			console.log(err);
+			return setAndSendResponse(res, responseError.UPLOAD_FILE_FAILED);
+		}
+	}
+
+    // upload cover_image
+	if(req.files && req.files.cover_image){
+		if(account.coverImage){
+			//xóa cover_image cũ
+			cloudinary.removeImg(account.coverImage.publicId);
+		}
+
+		// upload cover_image
+		try{
+			let data = await cloudinary.uploads(req.files.cover_image[0]);
+			account.coverImage = data;
+		} catch(err) {
+			console.log(err);
+			return setAndSendResponse(res, responseError.UPLOAD_FILE_FAILED);
+		}
+	}
+
+    await account.save();
+    let data = {
+        avatar: account.getAvatar(),
+        cover_image: account.coverImage != undefined ? account.coverImage.url : '',
+        username: account.name,
+        link: account.link,
+        city: account.city,
+        country: account.country,
+        created: account.createdAt.getTime().toString(),
+        description: account.description,
+    }
+
+    callRes(res, responseError.OK, data)
+})
+
+accountsController.get_user_info = expressAsyncHandler( async (req, res) => {
+    const {user_id} = req.query;
+	const {account} = req;
+
+    console.log(account); 
+    if(account.isBlocked) return setAndSendResponse(res, responseError.NOT_ACCESS);
+    
+    var user = null;
+    let data = {
+        id: null,
+        username: null,
+        created: null,
+        description: null,
+        avatar: null,
+        cover_image: null,
+        link: null,
+        address: null,
+        city: null,
+        country: null,
+        listing: null,
+        is_friend: null,
+        online: null
+    }
+
+    if(user_id){
+        if(!isValidId(user_id)) return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
+
+        user = await Account.findById(user_id);
+
+        if(!user) return setAndSendResponse(res, responseError.NO_DATA);
+
+        console.log(user);
+
+        if(user.isBlocked == true) {
+            console.log("tài khoản bị block"); 
+            return setAndSendResponse(res, responseError.USER_IS_NOT_VALIDATED);
+        }
+
+        if(user.blockedAccounts){
+            let index = user.blockedAccounts.findIndex(element => element.account.equals(account._id));
+            if (index >= 0) return callRes(res, responseError.USER_IS_NOT_VALIDATED, 'bạn bị người ta blocked rồi nên không thể lấy info của họ');
+            let index1 = account.blockedAccounts.findIndex(element => element.account.equals(user._id));
+            if (index1 >= 0) return callRes(res, responseError.USER_IS_NOT_VALIDATED, 'bạn đang blocked user muốn lấy info');
+        }
+        
+        // const [friend, isBlocked] = await Promise.all([
+        //     FriendList.findOne({$or: [
+        //         {user1_id: account._id, user2_id: user_id},
+        //         {user1_id: user_id, user2_id: account._id}
+        //     ]}),
+        //     FriendBlock.findOne({$or: [
+        //         {accountDoBlock_id: user_id, blockedUser_id: account._id},
+		// 		{accountDoBlock_id: account._id, blockedUser_id: user_id}
+        //     ]})
+        // ]);
+
+        // if(friend) isFriend = true;
+        // if(isBlocked) return setAndSendResponse(res, responseError.USER_IS_NOT_VALIDATED);
+    }else{
+        user = account;
+    }
+
+    // const friendNum = await FriendList.find({
+	// 	$or: [
+	// 		{user1_id: user._id}, 
+	// 		{user2_id: user._id}
+	// 	]
+	// }).countDocuments();
+
+    data.id = user._id.toString();
+    data.username = user.name;
+    data.created = Math.floor(user.createdAt.getTime() / 1000);
+    data.description = user.description;
+    data.avatar= user.avatar.url;
+    data.cover_image = user.coverImage.url;
+    data.link = user.link;
+    data.city = user.city;
+    data.country = user.country;
+    data.listing = user.friends.length;
+    data.online = user.online;
+    data.is_friend = false;
+    if (user_id) {
+        let indexExist = user.friends.findIndex(element => element.account.equals(account._id)); 
+        data.is_friend =  (indexExist >= 0) ? true : false;
+    }
+    return callRes(res, responseError.OK, data);
+})
 
 module.exports = accountsController;

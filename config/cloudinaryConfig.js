@@ -33,10 +33,21 @@ module.exports.uploads = (file) => {
     });
 };
 
-module.exports.remove = (publicId) => {
+module.exports.removeImg = (publicId) => {
     try{
         cloudinary.uploader.destroy(publicId, (result) => {
-            // console.log(result);
+            console.log(result);
+            console.log('remove successed');
+        });
+    } catch(err){
+        console.log(err);
+    }
+}
+
+module.exports.removeVideo = (publicId) => {
+    try{
+        cloudinary.uploader.destroy(publicId, { resource_type: "video" },(result) => {
+            console.log(result);
             console.log('remove successed');
         });
     } catch(err){

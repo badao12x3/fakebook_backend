@@ -1,3 +1,4 @@
+const convertString = require('../utils/convertString');
 const responseError = {
     OK: {
         statusCode: 200,
@@ -96,6 +97,13 @@ const responseError = {
             code: "9994", message: "No data or end of list data"
         }
     },
+    USER_IS_NOT_VALIDATED: {
+        statusCode: 400,
+        body: {
+            code: "9994", 
+            message: "User is not validated"
+        }
+    },
     USER_EXISTED: {
         statusCode: 400,
         body: {
@@ -137,4 +145,24 @@ function setAndSendResponse(res, responseError) {
     return res.status(responseError.statusCode).send(responseError.body);
 }
 
-module.exports = {responseError, setAndSendResponse};
+function callRes(res, responseErrorName, data=null) {
+    if (responseErrorName != responseError.OK){
+        let x = {
+          code: responseErrorName.body.code,
+          message: responseErrorName.body.message,
+          details: null
+        }
+        if (data) x.details = data.toString();
+        return res.status(responseErrorName.statusCode).send(convertString(x));
+      }
+      else {
+        let x = {
+          code: responseErrorName.body.code,
+          message: responseErrorName.body.message,
+          data: data 
+        }
+        return res.status(responseErrorName.statusCode).send(convertString(x));
+      }
+}
+
+module.exports = {responseError, setAndSendResponse, callRes};
