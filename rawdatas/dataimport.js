@@ -19,6 +19,7 @@ importDataRouter.post('/removeAll', expressAsyncHandler(async (req, res) => {
     await Comment.remove({});
     await Report.remove({});
     await Video.remove({});
+    res.send("Remove all successful");
 }));
 
 importDataRouter.post('/accounts', expressAsyncHandler(async (req, res) => {

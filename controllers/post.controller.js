@@ -73,25 +73,26 @@ postsController.get_list_posts = expressAsyncHandler(async (req, res) => {
     count = parseInt(count);
     if(!isNumber(index) || !isNumber(count) || index < 0 || count < 1)  return setAndSendResponse(res, responseError.PARAMETER_TYPE_IS_INVALID);
     const posts = await Post.find().populate({path: 'account_id', model: Account}).sort("-createdAt");
-    console.log(posts.map(post => post._id));
+    // console.log(posts.map(post => post._id));
     if (posts.length < 1) {
         return setAndSendResponse(res, responseError.NO_DATA);
     }
-    let index_last_id = posts.findIndex((element) => { return element._id == last_id });
-    console.log(index_last_id);
-    if (index_last_id == -1) {
-        last_id = posts[0]._id;
-        index_last_id = 0;
-    }
-    let slicePosts = posts.slice(index_last_id + index, index_last_id + index + count);
+    let index_last_id;
+    if (last_id)
+        index_last_id = posts.findIndex((element) => { return element._id == last_id });
+    else
+        index_last_id = index - 1;
+    // console.log(index_last_id);
+    let slicePosts = posts.slice(index_last_id + 1, index_last_id + 1 + count);
+    // console.log(slicePosts)
     if (slicePosts.length < 1) {
-        console.log('No have posts');
+        // console.log('No have posts');
         return setAndSendResponse(res, responseError.NO_DATA);
     }
     let result = {
         posts: slicePosts.map(post => {
             const isBlocked = post.account_id.blockedAccounts.findIndex((element) => {return element.account.toString() === req.account._id.toString()}) !== -1;
-            return {
+            let subResult = {
                 id: post._id,
                 described: post.described,
                 createdAt: post.createdAt.toString(),
@@ -111,22 +112,26 @@ postsController.get_list_posts = expressAsyncHandler(async (req, res) => {
                 can_comment: post.canComment ? '1' : '0'
             };
             if(post.images.length !== 0) {
-                result.images = post.images.map((image) => {
+                subResult.images = post.images.map((image) => {
                     let {url, publicId} = image;
                     return {url: url, publicId: publicId};
                 });
             }
             if(post.video && post.video.url != undefined) {
-                result.video = {
+                subResult.video = {
                     url: post.video.url,
                     publicId: post.getVideoThumb()
                 }
             }
+            return subResult;
         }),
-        new_items: index_last_id.toString(),
-        last_id: last_id
-    }
+        new_items: (index_last_id + 1 - index).toString(),
 
+    }
+    if (slicePosts.length > 0)
+    {
+        result.last_id = slicePosts[slicePosts.length-1]._id
+    }
     res.json({
         code: responseError.OK.statusCode,
         message: responseError.OK.body,
