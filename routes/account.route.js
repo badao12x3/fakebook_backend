@@ -11,7 +11,7 @@ accountRouter.post(
   "/set_request_friend",
   accountsController.set_request_friend
 );
-accountRouter.get(
+accountRouter.post(
   "/get_requested_friends",
   accountsController.get_requested_friends
 );

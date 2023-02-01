@@ -11,6 +11,7 @@ const {
 const {
   isValidPassword,
   isPhoneNumber,
+  isValidId,
 } = require("../validations/validateData");
 const { JWT_SECRET } = require("../constants/constants");
 const { findOne } = require("../models/account.model");
@@ -82,19 +83,171 @@ accountsController.signup = expressAsyncHandler(async (req, res) => {
 });
 
 accountsController.set_accept_friend = expressAsyncHandler(async (req, res) => {
+  const { _id, received_id } = req.body;
+  if (!_id || !received_id)
+    return setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
+
+  if (!isValidId(_id) || !isValidId(received_id) || _id === received_id)
+    return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
+
+  let account = await Account.findOne({ _id: _id }).select([
+    "friends",
+    "friendRequestReceived",
+    "friendRequestSent",
+    "blockedAccounts",
+  ]);
+
+  let account_sent = await Account.findOne({ _id: received_id });
+
+  if (account == null || account_sent == null) {
+    return setAndSendResponse(res, responseError.NO_DATA);
+  }
+
+  let list_friend = account["friends"];
+  let list_received_friend = account["friendRequestReceived"];
+  let list_sent_friend = account["friendRequestSent"];
+  let list_blockedAccounts = account["blockedAccounts"];
+  let hasRequest = false;
+  for (let i of list_friend) {
+    if (i["_id"] == received_id) {
+      return setAndSendResponse(res, responseError.HAS_BEEN_FRIEND);
+    }
+  }
+
+  for (let i of list_blockedAccounts) {
+    if (i["_id"] == received_id) {
+      return setAndSendResponse(res, responseError.SET_REQUEST_FRIEND_FAILED);
+    }
+  }
+
+  for (let i of list_received_friend) {
+    if (i["_id"] == received_id) {
+      console.log(2);
+      hasRequest = true;
+      break;
+    }
+  }
+
+  for (let i of list_sent_friend) {
+    if (i["_id"] == received_id) {
+      console.log(3);
+      hasRequest = true;
+      break;
+    }
+  }
+  if (1) {
+    return setAndSendResponse(res, responseError.SET_ACCEPT_FRIEND_FAILED);
+  }
+
   return setAndSendResponse(res, responseError.OK);
 });
+
 accountsController.set_request_friend = expressAsyncHandler(
   async (req, res) => {
+    const { id_send, received_id } = req.body;
+    if (!id_send || !received_id)
+      return setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
+
+    if (
+      !isValidId(id_send) ||
+      !isValidId(received_id) ||
+      id_send === received_id
+    )
+      return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
+
+    let account = await Account.findOne({ _id: id_send }).select([
+      "friends",
+      "friendRequestReceived",
+      "friendRequestSent",
+      "blockedAccounts",
+    ]);
+    let account_sent = await Account.findOne({ _id: received_id });
+
+    if (account == null || account_sent == null) {
+      return setAndSendResponse(res, responseError.NO_DATA);
+    }
+
+    let list_friend = account["friends"];
+    let list_received_friend = account["friendRequestReceived"];
+    let list_sent_friend = account["friendRequestSent"];
+    let list_blockedAccounts = account["blockedAccounts"];
+
+    for (let i of list_friend) {
+      if (i["_id"] == received_id) {
+        return setAndSendResponse(res, responseError.SET_REQUEST_FRIEND_FAILED);
+      }
+    }
+
+    for (let i of list_received_friend) {
+      if (i["_id"] == received_id) {
+        return setAndSendResponse(res, responseError.SET_REQUEST_FRIEND_FAILED);
+      }
+    }
+
+    for (let i of list_sent_friend) {
+      if (i["_id"] == received_id) {
+        return setAndSendResponse(res, responseError.SET_REQUEST_FRIEND_FAILED);
+      }
+    }
+
+    for (let i of list_blockedAccounts) {
+      if (i["_id"] == received_id) {
+        return setAndSendResponse(res, responseError.SET_REQUEST_FRIEND_FAILED);
+      }
+    }
+
+    var date = Date.now();
+    const filter_send = {
+      _id: id_send,
+    };
+    const _id_send = {
+      _id: received_id,
+      createdAt: date,
+    };
+    const update_send = {
+      $push: {
+        friendRequestSent: _id_send,
+      },
+    };
+
+    const filter_received = {
+      _id: received_id,
+    };
+    const _id_received = {
+      _id: id_send,
+      createdAt: date,
+    };
+    const update_received = {
+      $push: {
+        friendRequestReceived: _id_received,
+      },
+    };
+
+    await Account.updateOne(filter_send, update_send);
+    await Account.updateOne(filter_received, update_received);
+
     return setAndSendResponse(res, responseError.OK);
   }
 );
+
 accountsController.get_requested_friends = expressAsyncHandler(
   async (req, res) => {
-    const { _id } = req._id;
-    let account = await Account.findOne({
-      _id: _id,
-    });
+    const { _id } = req.body;
+    if (!_id) {
+      return setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
+    } else if (!isValidId(_id)) {
+      return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
+    }
+
+    let account = await Account.findOne({ _id: _id }).select(
+      "friendRequestReceived"
+    );
+
+    if (account == null) {
+      return setAndSendResponse(res, responseError.NO_DATA);
+    } else {
+      return res.status(responseError.OK.statusCode).json({ account });
+    }
   }
 );
 
