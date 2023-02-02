@@ -82,6 +82,68 @@ accountsController.signup = expressAsyncHandler(async (req, res) => {
   }
 });
 
+accountsController.del_request_friend = expressAsyncHandler(
+  async (req, res) => {
+    const { _id, received_id } = req.body;
+    if (!_id || !received_id)
+      return setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
+
+    if (!isValidId(_id) || !isValidId(received_id) || _id === received_id)
+      return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
+
+    let account = await Account.findOne({ _id: _id }).select([
+      "friends",
+      "friendRequestReceived",
+      "friendRequestSent",
+      "blockedAccounts",
+    ]);
+
+    let account_sent = await Account.findOne({ _id: received_id });
+
+    if (account == null || account_sent == null) {
+      return setAndSendResponse(res, responseError.NO_DATA);
+    }
+
+    let list_friend = account["friends"];
+    let list_received_friend = account["friendRequestReceived"];
+    let list_sent_friend = account["friendRequestSent"];
+    let list_blockedAccounts = account["blockedAccounts"];
+    let hasRequest = false;
+    let hasSent = false;
+
+    for (let i of list_friend) {
+      if (i["_id"] == received_id) {
+        return setAndSendResponse(res, responseError.HAS_BEEN_FRIEND);
+      }
+    }
+
+    for (let i of list_blockedAccounts) {
+      if (i["_id"] == received_id) {
+        return setAndSendResponse(res, responseError.SET_REQUEST_FRIEND_FAILED);
+      }
+    }
+
+    for (let i of list_received_friend) {
+      if (i["_id"] == received_id) {
+        hasRequest = true;
+        break;
+      }
+    }
+
+    for (let i of list_sent_friend) {
+      if (i["_id"] == received_id) {
+        hasSent = true;
+        break;
+      }
+    }
+    if (hasRequest && hasSent) {
+      return setAndSendResponse(res, responseError.OK);
+    }
+    
+    return setAndSendResponse(res, responseError.SET_ACCEPT_FRIEND_FAILED);
+  }
+);
+
 accountsController.set_accept_friend = expressAsyncHandler(async (req, res) => {
   const { _id, received_id } = req.body;
   if (!_id || !received_id)
@@ -108,6 +170,7 @@ accountsController.set_accept_friend = expressAsyncHandler(async (req, res) => {
   let list_sent_friend = account["friendRequestSent"];
   let list_blockedAccounts = account["blockedAccounts"];
   let hasRequest = false;
+
   for (let i of list_friend) {
     if (i["_id"] == received_id) {
       return setAndSendResponse(res, responseError.HAS_BEEN_FRIEND);
@@ -122,7 +185,6 @@ accountsController.set_accept_friend = expressAsyncHandler(async (req, res) => {
 
   for (let i of list_received_friend) {
     if (i["_id"] == received_id) {
-      console.log(2);
       hasRequest = true;
       break;
     }
@@ -130,12 +192,11 @@ accountsController.set_accept_friend = expressAsyncHandler(async (req, res) => {
 
   for (let i of list_sent_friend) {
     if (i["_id"] == received_id) {
-      console.log(3);
       hasRequest = true;
       break;
     }
   }
-  if (1) {
+  if (!hasRequest) {
     return setAndSendResponse(res, responseError.SET_ACCEPT_FRIEND_FAILED);
   }
 
