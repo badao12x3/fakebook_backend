@@ -34,9 +34,17 @@ importDataRouter.post(
 );
 
 importDataRouter.get(
+  "/show_all",
+  expressAsyncHandler(async (req, res) => {
+    const all = await Account.find({});
+    res.send({ all });
+  })
+);
+
+importDataRouter.get(
   "/accounts/all_id",
   expressAsyncHandler(async (req, res) => {
-    const all_id = await Account.find({}).select("_id");
+    const all_id = await Account.find({}).select("id");
     res.send({ all_id });
   })
 );
@@ -76,20 +84,26 @@ importDataRouter.post(
   })
 );
 
-importDataRouter.get(
+importDataRouter.post(
   "/friend",
   expressAsyncHandler(async (req, res) => {
     const all_id = await Account.find({}).select("_id");
-    let count = 1;
-    for (let i of all_id) {
-      count++;
-      const filter = i;
 
+    for (let i of all_id) {
+      const filter = i;
+      var listFriends = [];
+      for (let j = 0; j < 2; j++) {
+        var rd = Math.random() * Object.keys(all_id).length;
+        var friend = await Account.findOne({
+          $and: [{ _id: { $ne: i } }, { _id: { $nin: listFriends } }],
+        })
+          .select("_id")
+          .skip(rd);
+        if (friend) listFriends.push(friend);
+      }
       const update = {
         $set: {
-          friends: await Account.find({ _id: { $ne: i } })
-            .select("_id")
-            .limit(3),
+          friends: listFriends,
         },
       };
 
@@ -99,30 +113,129 @@ importDataRouter.get(
     res.send({ all });
   })
 );
-
-importDataRouter.get(
-  "/request_friend",
+// block_friend
+importDataRouter.post(
+  "/block_friend",
   expressAsyncHandler(async (req, res) => {
     const all_id = await Account.find({}).select(["_id", "friends"]);
-    let count = 1;
+
     for (let i of all_id) {
-      count++;
-      const filter = i;
+      var friends = [];
+      i["friends"].filter((item) => {
+        friends.push(item["_id"]);
+      });
+      console.log(friends);
+      var blockFriends = [];
+      for (let j = 0; j < 2; j++) {
+        var rd = Math.random() * Object.keys(all_id).length;
+        var blockFriend = await Account.findOne({
+          $and: [
+            { _id: { $ne: i } },
+            { _id: { $nin: friends } },
+            { _id: { $nin: blockFriends } },
+          ],
+        })
+          .select("_id")
+          .skip(rd);
+        if (blockFriend) blockFriends.push(blockFriend);
+      }
+
+      const _filter = i;
 
       const update = {
         $set: {
-          friendRequestReceived: await Account.find({
-            $and: [{ _id: { $ne: i } }, { _id: { $nin: i["friends"] } }],
-          })
-            .select("_id")
-            .limit(3),
+          blockedAccounts: blockFriends,
         },
       };
-      console.log(i["friends"]);
-      await Account.updateOne(filter, update);
+
+      await Account.updateOne(_filter, update);
     }
-    const all = await Account.find({}).select(["_id", "friendRequestReceived"]);
+    const all = await Account.find({}).select(["_id", "blockedAccounts"]);
     res.send({ all });
+  })
+);
+
+importDataRouter.post(
+  "/received--send_friend",
+  expressAsyncHandler(async (req, res) => {
+    const all_id = await Account.find({}).select([
+      "_id",
+      "friends",
+      "blockedAccounts",
+    ]);
+    for (let i of all_id) {
+      const filter_received = { _id: i["_id"] };
+      var friends = [];
+      i["friends"].filter((item) => {
+        friends.push(item["_id"]);
+      });
+      var blockFriends = [];
+      i["blockedAccounts"].filter((item) => {
+        blockFriends.push(item["_id"]);
+      });
+      for (let j = 0; j < 2; j++) {
+        var friendRequestReceived = [];
+        if (i["friendRequestReceived"])
+          i["friendRequestReceived"].filter((item) => {
+            friendRequestReceived.push(item["_id"]);
+          });
+        var friendRequestSent = [];
+        if (i["friendRequestSent"])
+          i["friendRequestSent"].filter((item) => {
+            friendRequestSent.push(item["_id"]);
+          });
+
+        var rd = Math.random() * Object.keys(all_id).length;
+        var requestFriend = await Account.findOne({
+          $and: [
+            { _id: { $ne: i["_id"] } },
+            { _id: { $nin: friends } },
+            { _id: { $nin: blockFriends } },
+            { _id: { $nin: friendRequestReceived } },
+            { _id: { $nin: friendRequestSent } },
+          ],
+        })
+          .select("_id")
+          .skip(rd);
+        if (requestFriend) {
+          var date = Date.now();
+          const id_received = {
+            _id: requestFriend["_id"],
+            createdAt: date,
+          };
+          const update_received = {
+            $push: {
+              friendRequestReceived: id_received,
+            },
+          };
+
+          const filter_send = {
+            _id: requestFriend["_id"],
+          };
+          const id_send = {
+            _id: i["_id"],
+            createdAt: date,
+          };
+          const update_send = {
+            $push: {
+              friendRequestSent: id_send,
+            },
+          };
+
+          await Account.updateOne(filter_received, update_received);
+          await Account.updateOne(filter_send, update_send);
+        }
+        i = await Account.findById(i["_id"]);
+      }
+    }
+
+    const about_friend = await Account.find({}).select([
+      "_id",
+      "friend",
+      "friendRequestReceived",
+      "friendRequestSent",
+    ]);
+    res.send({ about_friend });
   })
 );
 
