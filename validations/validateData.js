@@ -50,11 +50,19 @@ function isValidCoordinates(latitude, longitude) {
     return true;
 }
 
+// check link
+function checkLink (link) {
+    let banLink = ['bilutv.com', 'hayhaytv.com', 'hdviet.com', 'phimmoi.net', 'hdonline.vn', 'phimbathu.com', 'vnhackers.com'];
+    let result = banLink.filter(e => link.includes(e));
+    if (result.length > 0) return false;
+    else return true;
+  }
 module.exports = {
     isValidName,
     isValidPassword,
     isPhoneNumber,
     isValidId,
     isNumber,
-    isValidCoordinates
+    isValidCoordinates,
+    checkLink
 }
