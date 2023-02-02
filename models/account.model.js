@@ -82,7 +82,7 @@ const accountSchema = new mongoose.Schema({
   },
   blockedAccounts: [
     {
-      user: {
+      account: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "accounts",
       },

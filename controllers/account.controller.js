@@ -22,9 +22,9 @@ accountsController.login = expressAsyncHandler(async (req, res) => {
   if (!phoneNumber || !password) {
     return setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
   }
-  if (!isPhoneNumber(phoneNumber) || !isValidPassword(password)) {
-    return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
-  }
+  // if (!isPhoneNumber(phoneNumber) || !isValidPassword(password)) {
+  //   return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
+  // }
   // sẽ sửa lại bcrypt compare hashmap, hiện đang để tạm tìm như thế này
   let account = await Account.findOne({
     phoneNumber: phoneNumber,

@@ -153,6 +153,20 @@ const responseError = {
       message: "has been friend",
     },
   },
+  HAS_BEEN_LIKED: {
+    statusCode: 400,
+    body: {
+      code: "402",
+      message: "has been liked",
+    },
+  },
+  HAS_NOT_BEEN_LIKED: {
+    statusCode: 400,
+    body: {
+      code: "402",
+      message: "has not been liked",
+    },
+  },
 };
 
 function setAndSendResponse(res, responseError) {
