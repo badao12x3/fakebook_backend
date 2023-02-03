@@ -21,8 +21,8 @@ importDataRouter.post(
     await Comment.remove({});
     await Report.remove({});
     await Video.remove({});
-  })
-);
+    res.send("Remove all successful");
+}));
 
 importDataRouter.post(
   "/accounts",
