@@ -250,5 +250,24 @@ accountsController.get_requested_friends = expressAsyncHandler(
     }
   }
 );
+accountsController.get_block_account = expressAsyncHandler(async (req, res) => {
+  console.log(req.friends);
+  const { _id } = req.account?._id;
+  if (!_id) {
+    return setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
+  } else if (!isValidId(_id)) {
+    return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
+  }
+
+  let account = await Account.findOne({ _id: _id }).select("blockedAccounts");
+
+  if (account == null) {
+    return setAndSendResponse(res, responseError.NO_DATA);
+  } else {
+    return res
+      .status(responseError.OK.statusCode)
+      .json({ blockedAccounts: account?.blockedAccounts });
+  }
+});
 
 module.exports = accountsController;

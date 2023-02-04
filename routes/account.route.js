@@ -15,4 +15,9 @@ accountRouter.post(
   "/get_requested_friends",
   accountsController.get_requested_friends
 );
+accountRouter.post(
+  "/get_blocked_account",
+  auth,
+  accountsController.get_block_account
+);
 module.exports = accountRouter;
