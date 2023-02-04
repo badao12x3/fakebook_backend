@@ -16,6 +16,10 @@ app.use(bodyParser.urlencoded({ extended: true })); // for parsing x-www-form-ur
 app.get('/settings', function (req, res) {
     res.send('Settings Page');
 });
+app.post('/settings', function (req,res) {
+    const { value } = req.body;
+    res.json({value: value});
+})
 app.use("/", mainRouter);
 
 app.listen(PORT, () => {
