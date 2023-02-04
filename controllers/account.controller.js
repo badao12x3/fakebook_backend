@@ -79,139 +79,253 @@ accountsController.signup = expressAsyncHandler(async (req, res) => {
 
 accountsController.del_request_friend = expressAsyncHandler(
   async (req, res) => {
-    const { _id, received_id } = req.body;
-    if (!_id || !received_id)
+    const { sent_id, received_id } = req.body;
+    if (!sent_id || !received_id)
       return setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
 
-    if (!isValidId(_id) || !isValidId(received_id) || _id === received_id)
+    if (!isValidId(sent_id) || !isValidId(received_id) || sent_id === received_id)
       return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
 
-    let account = await Account.findOne({ _id: _id }).select([
-      "friends",
+    let account_sent = await Account.findOne({ _id: sent_id }).select([
       "friendRequestReceived",
+      "blockedAccounts",
+    ]);
+
+    let account_received = await Account.findOne({ _id: received_id }).select([
+      "friends",
       "friendRequestSent",
       "blockedAccounts",
     ]);
 
-    let account_sent = await Account.findOne({ _id: received_id });
-
-    if (account == null || account_sent == null) {
+    if (account_sent == null || account_received == null) {
       return setAndSendResponse(res, responseError.NO_DATA);
     }
 
-    let list_friend = account["friends"];
-    let list_received_friend = account["friendRequestReceived"];
-    let list_sent_friend = account["friendRequestSent"];
-    let list_blockedAccounts = account["blockedAccounts"];
+    let list_friend_received = account_received["friends"];
+    let list_sent_friend = account_received["friendRequestSent"];
+    let list_blockedAccounts_received = account_received["blockedAccounts"];
+
+    let list_received_friend = account_sent["friendRequestReceived"];
+    let list_blockedAccounts_sent = account_sent["blockedAccounts"];
+
     let hasRequest = false;
     let hasSent = false;
 
-    for (let i of list_friend) {
-      if (i["_id"] == received_id) {
+    for (let i of list_friend_received) {
+      if (i["friend"] == received_id) {
         return setAndSendResponse(res, responseError.HAS_BEEN_FRIEND);
       }
     }
 
-    for (let i of list_blockedAccounts) {
-      if (i["_id"] == received_id) {
-        return setAndSendResponse(res, responseError.SET_REQUEST_FRIEND_FAILED);
+    for (let i of list_blockedAccounts_received) {
+      if (i["account"] == received_id) {
+        return setAndSendResponse(res, responseError.HAS_BLOCK);
       }
     }
-
+    for (let i of list_blockedAccounts_sent) {
+      if (i["account"] == sent_id) {
+        return setAndSendResponse(res, responseError.HAS_BLOCK);
+      }
+    }
     for (let i of list_received_friend) {
-      if (i["_id"] == received_id) {
+      if (i["fromUser"] == received_id) {
         hasRequest = true;
         break;
       }
     }
+    
 
     for (let i of list_sent_friend) {
-      if (i["_id"] == received_id) {
+      if (i["toUser"] == sent_id) {
         hasSent = true;
         break;
       }
     }
+
     if (hasRequest && hasSent) {
+      var new_list_received_friend  = [];
+      for (let i of list_received_friend){
+        if (i["fromUser"]!=received_id){
+          new_list_received_friend.push(i);
+        }
+      }
+
+      const filter_sent = {
+        _id : sent_id
+      }
+
+      const update_sent = {
+        $set: {
+          friendRequestReceived: new_list_received_friend
+        }
+      }
+
+      await Account.updateOne(filter_sent, update_sent);
+
+      var new_list_sent_friend  = [];
+      
+      for (let i of list_sent_friend) {
+        if (i["toUser"] != sent_id) {
+          new_list_sent_friend.push(i);
+        }
+      }
+
+      const filter_received = {
+        _id : received_id
+      }
+
+      const update_received = {
+        $set: {
+          friendRequestSent: new_list_sent_friend
+        }
+      }
+
+      await Account.updateOne(filter_received, update_received);
+
       return setAndSendResponse(res, responseError.OK);
     }
     
-    return setAndSendResponse(res, responseError.SET_ACCEPT_FRIEND_FAILED);
+    return setAndSendResponse(res, responseError.DEL_REQUEST_FRIEND_FAILED);
   }
 );
 
-accountsController.set_accept_friend = expressAsyncHandler(async (req, res) => {
-  const { _id, received_id } = req.body;
-  if (!_id || !received_id)
-    return setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
 
-  if (!isValidId(_id) || !isValidId(received_id) || _id === received_id)
-    return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
+accountsController.set_accept_friend = expressAsyncHandler(
+  async (req, res) => {
+    const { sent_id, received_id } = req.body;
+    if (!sent_id || !received_id)
+      return setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
 
-  let account = await Account.findOne({ _id: _id }).select([
-    "friends",
-    "friendRequestReceived",
-    "friendRequestSent",
-    "blockedAccounts",
-  ]);
+    if (!isValidId(sent_id) || !isValidId(received_id) || sent_id === received_id)
+      return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
 
-  let account_sent = await Account.findOne({ _id: received_id });
+    let account_sent = await Account.findOne({ _id: sent_id }).select([
+      "friendRequestReceived",
+      "blockedAccounts",
+    ]);
 
-  if (account == null || account_sent == null) {
-    return setAndSendResponse(res, responseError.NO_DATA);
-  }
+    let account_received = await Account.findOne({ _id: received_id }).select([
+      "friends",
+      "friendRequestSent",
+      "blockedAccounts",
+    ]);
 
-  let list_friend = account["friends"];
-  let list_received_friend = account["friendRequestReceived"];
-  let list_sent_friend = account["friendRequestSent"];
-  let list_blockedAccounts = account["blockedAccounts"];
-  let hasRequest = false;
-
-  for (let i of list_friend) {
-    if (i["_id"] == received_id) {
-      return setAndSendResponse(res, responseError.HAS_BEEN_FRIEND);
+    if (account_sent == null || account_received == null) {
+      return setAndSendResponse(res, responseError.NO_DATA);
     }
-  }
 
-  for (let i of list_blockedAccounts) {
-    if (i["_id"] == received_id) {
-      return setAndSendResponse(res, responseError.SET_REQUEST_FRIEND_FAILED);
+    let list_friend_received = account_received["friends"];
+    let list_sent_friend = account_received["friendRequestSent"];
+    let list_blockedAccounts_received = account_received["blockedAccounts"];
+
+    let list_received_friend = account_sent["friendRequestReceived"];
+    let list_blockedAccounts_sent = account_sent["blockedAccounts"];
+
+    let hasRequest = false;
+    let hasSent = false;
+
+    for (let i of list_friend_received) {
+      if (i["friend"] == received_id) {
+        return setAndSendResponse(res, responseError.HAS_BEEN_FRIEND);
+      }
     }
-  }
 
-  for (let i of list_received_friend) {
-    if (i["_id"] == received_id) {
-      hasRequest = true;
-      break;
+    for (let i of list_blockedAccounts_received) {
+      if (i["account"] == received_id) {
+        return setAndSendResponse(res, responseError.HAS_BLOCK);
+      }
     }
-  }
-
-  for (let i of list_sent_friend) {
-    if (i["_id"] == received_id) {
-      hasRequest = true;
-      break;
+    for (let i of list_blockedAccounts_sent) {
+      if (i["account"] == sent_id) {
+        return setAndSendResponse(res, responseError.HAS_BLOCK);
+      }
     }
-  }
-  if (!hasRequest) {
-    return setAndSendResponse(res, responseError.SET_ACCEPT_FRIEND_FAILED);
-  }
+    for (let i of list_received_friend) {
+      if (i["fromUser"] == received_id) {
+        hasRequest = true;
+        break;
+      }
+    }
+    
 
-  return setAndSendResponse(res, responseError.OK);
-});
+    for (let i of list_sent_friend) {
+      if (i["toUser"] == sent_id) {
+        hasSent = true;
+        break;
+      }
+    }
+
+    if (hasRequest && hasSent) {
+      var new_list_received_friend  = [];
+      for (let i of list_received_friend){
+        if (i["fromUser"]!=received_id){
+          new_list_received_friend.push(i);
+        }
+      }
+
+      const filter_sent = {
+        _id : sent_id
+      }
+
+      const update_sent = {
+        $set: {
+          friendRequestReceived: new_list_received_friend
+        },
+        $push: {
+          friends: { 
+            friend: received_id 
+          },
+        }
+      }
+
+      await Account.updateOne(filter_sent, update_sent);
+
+      var new_list_sent_friend  = [];
+      
+      for (let i of list_sent_friend) {
+        if (i["toUser"] != sent_id) {
+          new_list_sent_friend.push(i);
+        }
+      }
+
+      const filter_received = {
+        _id : received_id
+      }
+
+      const update_received = {
+        $set: {
+          friendRequestSent: new_list_sent_friend
+        },
+        $push: {
+          friends: { 
+            friend: sent_id 
+          },
+        }
+      }
+
+      await Account.updateOne(filter_received, update_received);
+
+      return setAndSendResponse(res, responseError.OK);
+    }
+    
+    return setAndSendResponse(res, responseError.ACCECPT_REQUEST_FRIEND_FAILED);
+  }
+);
 
 accountsController.set_request_friend = expressAsyncHandler(
   async (req, res) => {
-    const { id_send, received_id } = req.body;
-    if (!id_send || !received_id)
+    const { sent_id, received_id } = req.body;
+    if (!sent_id || !received_id)
       return setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
 
     if (
-      !isValidId(id_send) ||
+      !isValidId(sent_id) ||
       !isValidId(received_id) ||
-      id_send === received_id
+      sent_id === received_id
     )
       return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
 
-    let account = await Account.findOne({ _id: id_send }).select([
+    let account = await Account.findOne({ _id: sent_id }).select([
       "friends",
       "friendRequestReceived",
       "friendRequestSent",
@@ -230,7 +344,7 @@ accountsController.set_request_friend = expressAsyncHandler(
 
     for (let i of list_friend) {
       if (i["friend"] == received_id) {
-        return setAndSendResponse(res, responseError.SET_REQUEST_FRIEND_FAILED);
+        return setAndSendResponse(res, responseError.HAS_BEEN_FRIEND);
       }
     }
 
@@ -248,21 +362,21 @@ accountsController.set_request_friend = expressAsyncHandler(
 
     for (let i of list_blockedAccounts) {
       if (i["account"] == received_id) {
-        return setAndSendResponse(res, responseError.SET_REQUEST_FRIEND_FAILED);
+        return setAndSendResponse(res, responseError.HAS_BLOCK);
       }
     }
 
     var date = Date.now();
     const filter_send = {
-      _id: id_send,
+      _id: sent_id,
     };
-    const _id_send = {
+    const _sent_id = {
       toUser: received_id,
       createdAt: date,
     };
     const update_send = {
       $push: {
-        friendRequestSent: _id_send,
+        friendRequestSent: _sent_id,
       },
     };
 
@@ -270,7 +384,7 @@ accountsController.set_request_friend = expressAsyncHandler(
       _id: received_id,
     };
     const _id_received = {
-      fromUser: id_send,
+      fromUser: sent_id,
       createdAt: date,
     };
     const update_received = {
