@@ -230,25 +230,25 @@ accountsController.set_request_friend = expressAsyncHandler(
     let list_blockedAccounts = account["blockedAccounts"];
 
     for (let i of list_friend) {
-      if (i["_id"] == received_id) {
+      if (i["friend"] == received_id) {
         return setAndSendResponse(res, responseError.SET_REQUEST_FRIEND_FAILED);
       }
     }
 
     for (let i of list_received_friend) {
-      if (i["_id"] == received_id) {
+      if (i["fromUser"] == received_id) {
         return setAndSendResponse(res, responseError.SET_REQUEST_FRIEND_FAILED);
       }
     }
 
     for (let i of list_sent_friend) {
-      if (i["_id"] == received_id) {
+      if (i["toUser"] == received_id) {
         return setAndSendResponse(res, responseError.SET_REQUEST_FRIEND_FAILED);
       }
     }
 
     for (let i of list_blockedAccounts) {
-      if (i["_id"] == received_id) {
+      if (i["account"] == received_id) {
         return setAndSendResponse(res, responseError.SET_REQUEST_FRIEND_FAILED);
       }
     }
@@ -258,7 +258,7 @@ accountsController.set_request_friend = expressAsyncHandler(
       _id: id_send,
     };
     const _id_send = {
-      _id: received_id,
+      toUser: received_id,
       createdAt: date,
     };
     const update_send = {
@@ -271,7 +271,7 @@ accountsController.set_request_friend = expressAsyncHandler(
       _id: received_id,
     };
     const _id_received = {
-      _id: id_send,
+      fromUser: id_send,
       createdAt: date,
     };
     const update_received = {
