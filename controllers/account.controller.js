@@ -141,12 +141,39 @@ accountsController.del_request_friend = expressAsyncHandler(
         break;
       }
     }
+<<<<<<< HEAD
 
     if (hasRequest && hasSent) {
       var new_list_received_friend  = [];
       for (let i of list_received_friend){
         if (i["fromUser"]!=received_id){
           new_list_received_friend.push(i);
+=======
+    // sẽ sửa lại bcrypt compare hashmap, hiện đang để tạm tìm như thế này
+    let account = await Account.findOne({phoneNumber: phoneNumber, password: password});
+    if (account == null){
+        // return response(res,9994);
+        return setAndSendResponse(res, responseError.NO_DATA);
+    }
+
+    let token = jwt.sign({
+        account_id: account._id,
+        phoneNumber: phoneNumber
+    }, JWT_SECRET,{expiresIn: "30d"});
+    account.online = true;
+    account.token = token; 
+    account.avatar.url = account.getAvatar();
+    account.save();
+    res.json({
+        code: responseError.OK.statusCode,
+        message: responseError.OK.body,
+        data: {
+            id: account._id,
+            name: account.name,
+            token: token,
+            avatar: account.getAvatar(),
+            active: account.active
+>>>>>>> d4993f6cb26c728b434b099c347bcdeed8af5b24
         }
       }
 

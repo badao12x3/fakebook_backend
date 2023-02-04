@@ -97,6 +97,13 @@ const responseError = {
             message: "Post is not existed"
         }
     },
+    POST_IS_BANNED: {
+        statusCode: 400,
+        body: {
+            code: "9992",
+            message: "Post is banned"
+        }
+    },
     VIDEO_IS_NOT_EXISTED: {
         statusCode: 400,
         body: {

@@ -7,6 +7,9 @@ const Comment = require('../models/comment.model');
 const Account = require('../models/account.model');
 
 const {setAndSendResponse, responseError, callRes} = require('../constants/response_code');
+
+const Report = require('../models/report.model');
+
 const {isNumber, isValidId} = require("../validations/validateData");
 
  //import cloud storage
@@ -637,4 +640,35 @@ postsController.edit_post = expressAsyncHandler(async (req, res) => {
         return setAndSendResponse(res, responseError.CAN_NOT_CONNECT_TO_DB);
     }
 });
+
+postsController.report_post = expressAsyncHandler(async (req, res) => {
+    const {id, subject, details} = req.body;
+    const account = req.account;
+
+    if(!id || !subject || !details) setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
+
+    if(!isValidId(id)) setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
+
+    //Check user being blocked or not
+    if(account.isBlocked) setAndSendResponse(res, responseError.NOT_ACCESS);
+
+    //Get post
+    const post = await Post.findById(id);
+    if(post == null) setAndSendResponse(res, responseError.POST_IS_NOT_EXISTED);
+    if(post.banned === "true") setAndSendResponse(res, responseError.POST_IS_BANNED);
+
+    //Reporter and post'author is same person
+    if(account._id.toString() === post.account_id.toString()) setAndSendResponse(res, responseError.UNKNOWN_ERROR);
+
+    await new Report({
+        reporter_id: account._id,
+        post_id: id,
+        subject: subject,
+        details: details
+    })
+
+    setAndSendResponse(res, responseError.OK);
+    // res.send(account._id)
+});
+
 module.exports = postsController;
