@@ -402,7 +402,7 @@ accountsController.set_request_friend = expressAsyncHandler(
 
 accountsController.get_requested_friends = expressAsyncHandler(
   async (req, res) => {
-    const { _id } = req.body;
+    const { _id } = req.query;
     if (!_id) {
       return setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
     } else if (!isValidId(_id)) {
