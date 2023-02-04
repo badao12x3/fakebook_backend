@@ -139,6 +139,45 @@ const responseError = {
             message: "Not authorized, no token"
         }
     },
+    HAS_BEEN_FRIEND: {
+        statusCode: 400,
+        body: {
+            code: "402",
+            message: "has been friend"
+        }
+    },
+    HAS_BLOCK: {
+        statusCode: 400,
+        body: {
+            code: "402",
+            message: "blocked each other"
+        }
+    },
+
+    DEL_REQUEST_FRIEND_FAILED: {
+        statusCode: 400,
+        body: {
+            code: "402",
+            message: "failed to delete request friend"
+        }
+    },
+
+    ACCECPT_REQUEST_FRIEND_FAILED: {
+        statusCode: 400,
+        body: {
+            code: "402",
+            message: "failed to accept request friend"
+        }
+    },
+
+    SET_REQUEST_FRIEND_FAILED: {
+        statusCode: 400,
+        body: {
+            code: "402",
+            message: "failed to set request friend"
+        }
+    },
+
 }
 
 function setAndSendResponse(res, responseError) {

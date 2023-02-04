@@ -7,6 +7,7 @@ const uploadAvatarOrCoverImageMiddleware = require("../middlewares/uploadAvatarO
 
 accountRouter.post("/login", accountsController.login);
 accountRouter.post("/signup", accountsController.signup);
+accountRouter.post("/del_request_friend", accountsController.del_request_friend);
 accountRouter.post("/set_accept_friend", accountsController.set_accept_friend);
 accountRouter.post(
   "/set_request_friend",

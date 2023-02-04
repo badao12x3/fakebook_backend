@@ -276,6 +276,20 @@ importDataRouter.post(
   })
 );
 
+importDataRouter.get(
+  "/show_friend",
+  expressAsyncHandler(async (req, res) => {
+    const all = await Account.find({}).select([
+      "_id",
+      "friends",
+      "blockedAccounts",
+      "friendRequestReceived",
+      "friendRequestSent",
+    ]);
+    res.send({ all });
+  })
+);
+
 importDataRouter.post(
   "/friend",
   expressAsyncHandler(async (req, res) => {
