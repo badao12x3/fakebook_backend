@@ -26,9 +26,13 @@ function isValidPassword(password){
 }
 
 function isNumber(num){
-    const regNum = /^-?\d+$/;
+    const regNum = /^\d+$/;
     return regNum.test(num);
 }
+// function isNumber(num){
+//     const regNum = /^-?\d+$/;
+//     return regNum.test(num);
+// }
 
 function isValidId(id){
     const regId = /^[0-9a-fA-F]{24}$/;

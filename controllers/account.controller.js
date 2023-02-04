@@ -29,7 +29,7 @@ accountsController.login = expressAsyncHandler(async (req, res) => {
         phoneNumber: phoneNumber
     }, JWT_SECRET,{expiresIn: "30d"});
     account.online = true;
-    account.token = token;
+    account.token = token; 
     account.avatar.url = account.getAvatar();
     account.save();
     res.json({
