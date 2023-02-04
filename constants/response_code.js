@@ -1,4 +1,17 @@
-const convertString = require('../utils/convertString');
+/*
+    2xx Success (Thành công)
+200 OK: Request đã được tiếp nhận và xử lý thành công.
+201 Created: Request đã được xử lý, kết quả của việc xử lý tạo ra một resource mới. Thông thường trả về URI resourse mới tạo
+204 No Content: Server đã xử lý thành công request nhưng không trả về bất cứ content nào.
+    4xx: Client Error (Lỗi Client)
+400 Bad Request: Server không thể xử lý hoặc sẽ không xử lý các Request lỗi của phía client
+401 Unauthorized token
+403 Forbidden: Request là hợp lệ nhưng server từ chối đáp ứng nó. Nó có nghĩa là trái phép, người dùng không có quyền cần thiết để tiếp cận với các tài nguyên.
+404 Not Found: Các tài nguyên hiện tại không được tìm thấy nhưng có thể có trong tương lai
+    5xx: Server Error (Lỗi Server)
+500 Internal Server Error: Một thông báo chung chung, được đưa ra khi Server gặp phải một trường hợp bất ngờ, Message cụ thể là không phù hợp.
+*/
+
 const responseError = {
     OK: {
         statusCode: 200,
@@ -78,7 +91,7 @@ const responseError = {
         }
     },
     POST_IS_NOT_EXISTED: {
-        statusCode: 400,
+        statusCode: 204, // fix
         body: {
             code: "9992",
             message: "Post is not existed"
@@ -92,15 +105,16 @@ const responseError = {
         }
     },
     NO_DATA: {
-        statusCode: 400,
+        statusCode: 400, // fix and restore // sử dụng 204 sẽ không trả về bất kì kết quả nào
         body: {
-            code: "9994", message: "No data or end of list data"
+            code: "9994",
+            message: "No data or end of list data"
         }
     },
     USER_IS_NOT_VALIDATED: {
-        statusCode: 400,
+        statusCode: 401, // fix
         body: {
-            code: "9994", 
+            code: "9995",
             message: "User is not validated"
         }
     },
@@ -126,14 +140,14 @@ const responseError = {
         }
     },
     NOT_AUTHORIZED_TOKEN_FAILED: {
-        statusCode: 400,
+        statusCode: 401, // fix
         body: {
             code: "401",
             message: "Not authorized, token failed"
         }
     },
     NOT_AUTHORIZED_NO_TOKEN: {
-        statusCode: 400,
+        statusCode: 401, // fix
         body: {
             code: "402",
             message: "Not authorized, no token"
@@ -146,23 +160,23 @@ function setAndSendResponse(res, responseError) {
 }
 
 function callRes(res, responseErrorName, data=null) {
-    if (responseErrorName != responseError.OK){
+    if (responseErrorName != responseError.OK) {
         let x = {
           code: responseErrorName.body.code,
           message: responseErrorName.body.message,
           details: null
         }
         if (data) x.details = data.toString();
-        return res.status(responseErrorName.statusCode).send(convertString(x));
-      }
-      else {
+        return res.status(responseErrorName.statusCode).json(x);
+    }
+    else {
         let x = {
           code: responseErrorName.body.code,
           message: responseErrorName.body.message,
-          data: data 
+          data: data
         }
-        return res.status(responseErrorName.statusCode).send(convertString(x));
-      }
+        return res.status(responseErrorName.statusCode).json(x);
+    }
 }
 
 module.exports = {responseError, setAndSendResponse, callRes};

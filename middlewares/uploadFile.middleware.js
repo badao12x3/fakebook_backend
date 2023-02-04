@@ -18,9 +18,8 @@ module.exports = (req, res, next) => {
             {name: 'video', maxCount: 1}
         ]);
     upload(req, res, (error) => {
-        if(error){
-            console.log("ddaay nè")
-            console.log(error);
+        if(error) {
+            // console.log(error);
             if(error.code === 'LIMIT_UNEXPECTED_FILE'){
                 // vượt quá 4 ảnh
                 return setAndSendResponse(res, responseError.MAXIMUM_NUMBER_OF_IMAGES);
@@ -29,7 +28,7 @@ module.exports = (req, res, next) => {
                 return setAndSendResponse(res, responseError.PARAMETER_TYPE_IS_INVALID);
             }
             setAndSendResponse(res,responseError.UPLOAD_FILE_FAILED);
-        }else{
+        } else {
             next();
         }
     })

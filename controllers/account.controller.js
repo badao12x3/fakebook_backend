@@ -27,8 +27,7 @@ accountsController.login = expressAsyncHandler(async (req, res) => {
     password: password,
   });
   if (account == null) {
-    // return response(res,9994);
-    return setAndSendResponse(res, responseError.NO_DATA);
+    return setAndSendResponse(res, responseError.USER_IS_NOT_VALIDATED);
   }
 
   let token = jwt.sign(
@@ -43,9 +42,9 @@ accountsController.login = expressAsyncHandler(async (req, res) => {
   account.token = token;
   account.avatar.url = account.getAvatar();
   account.save();
-  res.json({
-    code: responseError.OK.statusCode,
-    message: responseError.OK.body,
+  res.status(responseError.OK.statusCode).json({
+    code: responseError.OK.body.code,
+    message: responseError.OK.body.message,
     data: {
       id: account._id,
       name: account.name,
@@ -441,9 +440,9 @@ accountsController.get_user_info = expressAsyncHandler( async (req, res) => {
 
         if(user.blockedAccounts){
             let index = user.blockedAccounts.findIndex(element => element.account.equals(account._id));
-            if (index >= 0) return callRes(res, responseError.USER_IS_NOT_VALIDATED, 'bạn bị người ta blocked rồi nên không thể lấy info của họ');
+            if (index >= 0) return callRes(res, responseError.USER_IS_NOT_VALIDATED, 'Bạn bị người ta blocked rồi nên không thể lấy info của họ');
             let index1 = account.blockedAccounts.findIndex(element => element.account.equals(user._id));
-            if (index1 >= 0) return callRes(res, responseError.USER_IS_NOT_VALIDATED, 'bạn đang blocked user muốn lấy info');
+            if (index1 >= 0) return callRes(res, responseError.USER_IS_NOT_VALIDATED, 'Bạn đang blocked user muốn lấy info');
         }
         
         // const [friend, isBlocked] = await Promise.all([
