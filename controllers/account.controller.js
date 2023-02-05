@@ -12,6 +12,8 @@ const {
   isValidPassword,
   isPhoneNumber,
   isValidId,
+  isValidName,
+  isGender,
 } = require("../validations/validateData");
 const { JWT_SECRET } = require("../constants/constants");
 const { findOne } = require("../models/account.model");
@@ -325,5 +327,74 @@ accountsController.change_password = expressAsyncHandler(async (req, res) => {
   //   );
   // }
 });
+accountsController.change_info_after_signup = expressAsyncHandler(
+  async (req, res) => {
+    const { username, gender, description, city, country, link } = req.body;
+    const { account } = req;
 
+    // ko gửi thông tin gì lên
+    if (!username || !gender) {
+      return setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
+    }
+    // mô tả hơn 150 kí tự
+    if (description && description.length > 150) {
+      return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
+    }
+
+    // tài khoản đã bị khóa
+    if (account.isBlocked) {
+      console.log("tài khoản đã bị khóa");
+      return setAndSendResponse(res, responseError.NOT_ACCESS);
+    }
+    if (account.active) {
+      return setAndSendResponse(res, responseError.NOT_ACCESS);
+    }
+    // tên sai định dạng
+    if (username && !isValidName(username)) {
+      console.log("tên sai định dạng");
+      return setAndSendResponse(
+        res,
+        responseError.PARAMETER_VALUE_IS_INVALID,
+        "username"
+      );
+    }
+    if (!isGender(gender))
+      return setAndSendResponse(
+        res,
+        responseError.PARAMETER_VALUE_IS_INVALID,
+        "gender"
+      );
+    // tên sai định dạng
+    if (city && typeof city !== "string")
+      return setAndSendResponse(res, responseError.PARAMETER_TYPE_IS_INVALID);
+    if (country && typeof country !== "string")
+      return setAndSendResponse(res, responseError.PARAMETER_TYPE_IS_INVALID);
+
+    if (link) {
+      if (typeof link !== "string")
+        return setAndSendResponse(res, responseError.PARAMETER_TYPE_IS_INVALID);
+
+      if (!checkLink(link))
+        return setAndSendResponse(res, responseError.PARAMETER_TYPE_IS_INVALID);
+    }
+
+    if (username) account.name = username;
+    if (gender) account.gender = gender;
+    if (description) account.description = description;
+    if (city) account.city = city;
+    if (country) account.country = country;
+    if (link) account.link = link;
+    account.active = true;
+
+    // upload avatar
+    await Account.findOneAndUpdate({ _id: account._id }, account);
+
+    return setAndSendResponse(res, responseError.OK);
+  }
+);
+accountsController.logout = expressAsyncHandler(async (req, res) => {
+  const { account } = req;
+  await Account.findOneAndUpdate({ _id: account._id }, { token: undefined });
+  return setAndSendResponse(res, responseError.OK);
+});
 module.exports = accountsController;

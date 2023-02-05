@@ -167,6 +167,7 @@ postsController.like_post = expressAsyncHandler(async (req, res) => {
     return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
   }
   let post = await Post.findById(id);
+  console.log(id, "-", post);
   if (post == null) {
     return setAndSendResponse(res, responseError.POST_IS_NOT_EXISTED);
   }

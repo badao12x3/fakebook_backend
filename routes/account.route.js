@@ -25,4 +25,10 @@ accountRouter.post(
   auth,
   accountsController.change_password
 );
+accountRouter.post(
+  "/change_info_after_signup",
+  auth,
+  accountsController.change_info_after_signup
+);
+accountRouter.post("/logout", auth, accountsController.logout);
 module.exports = accountRouter;
