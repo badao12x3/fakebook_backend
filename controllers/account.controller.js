@@ -251,7 +251,6 @@ accountsController.get_requested_friends = expressAsyncHandler(
   }
 );
 accountsController.get_block_account = expressAsyncHandler(async (req, res) => {
-  console.log(req.friends);
   const { _id } = req.account?._id;
   if (!_id) {
     return setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
@@ -268,6 +267,63 @@ accountsController.get_block_account = expressAsyncHandler(async (req, res) => {
       .status(responseError.OK.statusCode)
       .json({ blockedAccounts: account?.blockedAccounts });
   }
+});
+accountsController.change_password = expressAsyncHandler(async (req, res) => {
+  const { password, newPassword } = req.body;
+  if (!password || !newPassword) {
+    return callRes(res, responseError.PARAMETER_IS_NOT_ENOUGH);
+  }
+  if (!isValidPassword(password)) {
+    return callRes(res, responseError.PARAMETER_VALUE_IS_INVALID, "password");
+  }
+  if (!isValidPassword(newPassword)) {
+    return callRes(
+      res,
+      responseError.PARAMETER_VALUE_IS_INVALID,
+      "newPassword"
+    );
+  }
+
+  if (password == newPassword) {
+    return callRes(
+      res,
+      responseError.PARAMETER_VALUE_IS_INVALID,
+      "newPassword == password"
+    );
+  }
+
+  // Check xau con chung dai nhat > 80%
+  // var OverlapSubStringRatio =
+  //   LCS(password, newPassword).length / newPassword.length;
+  // if (OverlapSubStringRatio > 0.8) {
+  //   return callRes(
+  //     res,
+  //     responseError.PARAMETER_VALUE_IS_INVALID,
+  //     "newPassword va password co xau con chung/newPassword > 80%"
+  //   );
+  // }
+  try {
+    user = await Account.findOne({ _id: req.account._id });
+    if (password != user.password) {
+      return setAndSendResponse(res, responseError.PASSWORD_IS_INCORRECT);
+    }
+    await Account.findOneAndUpdate(
+      { _id: req.account._id },
+      { password: newPassword }
+    );
+    return setAndSendResponse(res, responseError.OK);
+  } catch (err) {
+    return setAndSendResponse(res, responseError.CAN_NOT_CONNECT_TO_DB);
+  }
+
+  // var isPassword = bcrypt.compareSync(password, user.password);
+  // if (!isPassword) {
+  //   return callRes(
+  //     res,
+  //     responseError.PARAMETER_VALUE_IS_INVALID,
+  //     "password khong dung"
+  //   );
+  // }
 });
 
 module.exports = accountsController;

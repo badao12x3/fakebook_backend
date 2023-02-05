@@ -20,4 +20,9 @@ accountRouter.post(
   auth,
   accountsController.get_block_account
 );
+accountRouter.post(
+  "/change_password",
+  auth,
+  accountsController.change_password
+);
 module.exports = accountRouter;

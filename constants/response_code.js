@@ -167,6 +167,13 @@ const responseError = {
       message: "has not been liked",
     },
   },
+  PASSWORD_IS_INCORRECT: {
+    statusCode: 400,
+    body: {
+      code: "402",
+      message: "Password is incorrect",
+    },
+  },
 };
 
 function setAndSendResponse(res, responseError) {
