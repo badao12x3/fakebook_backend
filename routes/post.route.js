@@ -14,4 +14,7 @@ postRouter.delete('/delete_post/:id', auth, postsController.delete_post);
 postRouter.post('/edit_post', uploadFile, auth, postsController.edit_post);
 postRouter.post('/report_post', auth, postsController.report_post);
 
+postRouter.post("/like_post", auth, postsController.like_post);
+postRouter.post("/unlike_post", auth, postsController.unlike_post);
+
 module.exports = postRouter;

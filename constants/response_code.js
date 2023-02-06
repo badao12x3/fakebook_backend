@@ -182,7 +182,6 @@ const responseError = {
             message: "failed to delete request friend"
         }
     },
-
     ACCECPT_REQUEST_FRIEND_FAILED: {
         statusCode: 400,
         body: {
@@ -190,7 +189,6 @@ const responseError = {
             message: "failed to accept request friend"
         }
     },
-
     SET_REQUEST_FRIEND_FAILED: {
         statusCode: 400,
         body: {
@@ -198,28 +196,49 @@ const responseError = {
             message: "failed to set request friend"
         }
     },
+    HAS_BEEN_LIKED: {
+        statusCode: 400,
+        body: {
+            code: "402",
+            message: "has been liked",
+        },
+    },
+    HAS_NOT_BEEN_LIKED: {
+        statusCode: 400,
+        body: {
+            code: "402",
+            message: "has not been liked",
+        },
+    },
+    PASSWORD_IS_INCORRECT: {
+        statusCode: 400,
+        body: {
+            code: "402",
+            message: "Password is incorrect",
+        },
+    }
 
 }
 
 function setAndSendResponse(res, responseError) {
-  return res.status(responseError.statusCode).send(responseError.body);
+    return res.status(responseError.statusCode).send(responseError.body);
 }
 
 function callRes(res, responseErrorName, data=null) {
     if (responseErrorName != responseError.OK) {
         let x = {
-          code: responseErrorName.body.code,
-          message: responseErrorName.body.message,
-          details: null
+            code: responseErrorName.body.code,
+            message: responseErrorName.body.message,
+            details: null
         }
         if (data) x.details = data.toString();
         return res.status(responseErrorName.statusCode).json(x);
     }
     else {
         let x = {
-          code: responseErrorName.body.code,
-          message: responseErrorName.body.message,
-          data: data
+            code: responseErrorName.body.code,
+            message: responseErrorName.body.message,
+            data: data
         }
         return res.status(responseErrorName.statusCode).json(x);
     }

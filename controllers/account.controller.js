@@ -189,7 +189,6 @@ accountsController.del_request_friend = expressAsyncHandler(
     }
 );
 
-
 accountsController.set_accept_friend = expressAsyncHandler(
     async (req, res) => {
         const { sent_id, received_id } = req.body;
@@ -601,5 +600,153 @@ accountsController.get_user_info = expressAsyncHandler( async (req, res) => {
     }
     return callRes(res, responseError.OK, data);
 })
+
+accountsController.change_info_after_signup = expressAsyncHandler(
+  async (req, res) => {
+    const { username, gender, description, city, country, link } = req.body;
+    const { account } = req;
+
+    // ko gửi thông tin gì lên
+    if (!username || !gender) {
+      return setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
+    }
+    // mô tả hơn 150 kí tự
+    if (description && description.length > 150) {
+      return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
+    }
+
+    // tài khoản đã bị khóa
+    if (account.isBlocked) {
+      console.log("tài khoản đã bị khóa");
+      return setAndSendResponse(res, responseError.NOT_ACCESS);
+    }
+    if (account.active) {
+      return setAndSendResponse(res, responseError.NOT_ACCESS);
+    }
+    // tên sai định dạng
+    if (username && !isValidName(username)) {
+      console.log("tên sai định dạng");
+      return setAndSendResponse(
+        res,
+        responseError.PARAMETER_VALUE_IS_INVALID,
+        "username"
+      );
+    }
+    if (!isGender(gender))
+      return setAndSendResponse(
+        res,
+        responseError.PARAMETER_VALUE_IS_INVALID,
+        "gender"
+      );
+    // tên sai định dạng
+    if (city && typeof city !== "string")
+      return setAndSendResponse(res, responseError.PARAMETER_TYPE_IS_INVALID);
+    if (country && typeof country !== "string")
+      return setAndSendResponse(res, responseError.PARAMETER_TYPE_IS_INVALID);
+
+    if (link) {
+      if (typeof link !== "string")
+        return setAndSendResponse(res, responseError.PARAMETER_TYPE_IS_INVALID);
+
+      if (!checkLink(link))
+        return setAndSendResponse(res, responseError.PARAMETER_TYPE_IS_INVALID);
+    }
+
+    if (username) account.name = username;
+    if (gender) account.gender = gender;
+    if (description) account.description = description;
+    if (city) account.city = city;
+    if (country) account.country = country;
+    if (link) account.link = link;
+    account.active = true;
+
+    // upload avatar
+    await Account.findOneAndUpdate({ _id: account._id }, account);
+
+    return setAndSendResponse(res, responseError.OK);
+  }
+);
+
+accountsController.get_block_account = expressAsyncHandler(async (req, res) => {
+    const { _id } = req.account?._id;
+    if (!_id) {
+        return setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
+    } else if (!isValidId(_id)) {
+        return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
+    }
+
+    let account = await Account.findOne({ _id: _id }).select("blockedAccounts");
+
+    if (account == null) {
+        return setAndSendResponse(res, responseError.NO_DATA);
+    } else {
+        return res
+            .status(responseError.OK.statusCode)
+            .json({ blockedAccounts: account?.blockedAccounts });
+    }
+});
+accountsController.change_password = expressAsyncHandler(async (req, res) => {
+    const { password, newPassword } = req.body;
+    if (!password || !newPassword) {
+        return callRes(res, responseError.PARAMETER_IS_NOT_ENOUGH);
+    }
+    if (!isValidPassword(password)) {
+        return callRes(res, responseError.PARAMETER_VALUE_IS_INVALID, "password");
+    }
+    if (!isValidPassword(newPassword)) {
+        return callRes(
+            res,
+            responseError.PARAMETER_VALUE_IS_INVALID,
+            "newPassword"
+        );
+    }
+
+    if (password == newPassword) {
+        return callRes(
+            res,
+            responseError.PARAMETER_VALUE_IS_INVALID,
+            "newPassword == password"
+        );
+    }
+
+    // Check xau con chung dai nhat > 80%
+    // var OverlapSubStringRatio =
+    //   LCS(password, newPassword).length / newPassword.length;
+    // if (OverlapSubStringRatio > 0.8) {
+    //   return callRes(
+    //     res,
+    //     responseError.PARAMETER_VALUE_IS_INVALID,
+    //     "newPassword va password co xau con chung/newPassword > 80%"
+    //   );
+    // }
+    try {
+        user = await Account.findOne({ _id: req.account._id });
+        if (password != user.password) {
+            return setAndSendResponse(res, responseError.PASSWORD_IS_INCORRECT);
+        }
+        await Account.findOneAndUpdate(
+            { _id: req.account._id },
+            { password: newPassword }
+        );
+        return setAndSendResponse(res, responseError.OK);
+    } catch (err) {
+        return setAndSendResponse(res, responseError.CAN_NOT_CONNECT_TO_DB);
+    }
+
+    // var isPassword = bcrypt.compareSync(password, user.password);
+    // if (!isPassword) {
+    //   return callRes(
+    //     res,
+    //     responseError.PARAMETER_VALUE_IS_INVALID,
+    //     "password khong dung"
+    //   );
+    // }
+});
+
+accountsController.logout = expressAsyncHandler(async (req, res) => {
+  const { account } = req;
+  await Account.findOneAndUpdate({ _id: account._id }, { token: undefined });
+  return setAndSendResponse(res, responseError.OK);
+});
 
 module.exports = accountsController;
