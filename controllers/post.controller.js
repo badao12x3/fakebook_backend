@@ -55,9 +55,12 @@ postsController.get_post = expressAsyncHandler(async (req, res) => {
             return setAndSendResponse(res, responseError.POST_IS_NOT_EXISTED);
         }
 
-        if (post.banned == '1') {
-            return callRes(res, responseError.NOT_ACCESS, 'Bài viết đã bị khóa do vi phạm cộng đồng');
+        // bài viết bị khóa
+        if (post.banned) {
+            // console.log("bài viết bị khóa");
+            return setAndSendResponse(res, responseError.POST_IS_BANNED);
         }
+
         let author = await Account.findOne({_id: post.account_id}).exec();
 
         const isBlocked = author.blockedAccounts.findIndex((element) => {
@@ -77,12 +80,12 @@ postsController.get_post = expressAsyncHandler(async (req, res) => {
                 name: author.name,
                 avatar: author.getAvatar()
             },
-            is_liked: post.likedAccounts.includes(req.account._id) ? '1' : '0',
+            is_liked: post.likedAccounts.includes(req.account._id),
             status: post.status,
-            is_blocked: isBlocked ? '1' : '0',
-            can_edit: req.account._id.equals(author._id) ? (post.banned ? '0' : '1') : '0',
+            is_blocked: isBlocked,
+            can_edit: req.account._id.equals(author._id) ? (post.banned ? false : true) : false,
             banned: post.banned,
-            can_comment: post.canComment ? '1' : '0'
+            can_comment: post.canComment
         };
         if (post.images.length !== 0) {
             result.images = post.images.map((image) => {
@@ -158,12 +161,12 @@ postsController.get_list_posts = expressAsyncHandler(async (req, res) => {
                         name: post.account_id.name,
                         avatar: post.account_id.getAvatar()
                     },
-                    is_liked: post.likedAccounts.includes(req.account._id) ? '1' : '0',
+                    is_liked: post.likedAccounts.includes(req.account._id),
                     status: post.status,
-                    is_blocked: isBlocked ? '1' : '0',
-                    can_edit: req.account._id.equals(post.account_id._id) ? (post.banned ? '0' : '1') : '0',
+                    is_blocked: isBlocked,
+                    can_edit: req.account._id.equals(post.account_id._id) ? (post.banned ? false : true) : false,
                     banned: post.banned,
-                    can_comment: post.canComment ? '1' : '0'
+                    can_comment: post.canComment
                 };
                 if (post.images.length !== 0) {
                     subResult.images = post.images.map((image) => {
@@ -179,7 +182,7 @@ postsController.get_list_posts = expressAsyncHandler(async (req, res) => {
                 }
                 return subResult;
             }),
-            new_items: (index_last_id + 1 - index).toString(),
+            new_items: (index_last_id + 1 - index),
 
         }
         if (slicePosts.length > 0) {
@@ -360,9 +363,9 @@ postsController.delete_post = expressAsyncHandler(async (req, res) => {
     }
 
     // bài viết bị khóa
-    if (post.banned == "1") {
+    if (post.banned) {
         // console.log("bài viết bị khóa");
-        return setAndSendResponse(res, responseError.POST_IS_NOT_EXISTED);
+        return setAndSendResponse(res, responseError.POST_IS_BANNED);
     }
 
     // console.log(post.account_id);
@@ -657,7 +660,12 @@ postsController.report_post = expressAsyncHandler(async (req, res) => {
     //Get post
     const post = await Post.findById(id);
     if (post == null) setAndSendResponse(res, responseError.POST_IS_NOT_EXISTED);
-    if (post.banned === "true") setAndSendResponse(res, responseError.POST_IS_BANNED);
+
+    // bài viết bị khóa
+    if (post.banned) {
+        // console.log("bài viết bị khóa");
+        return setAndSendResponse(res, responseError.POST_IS_BANNED);
+    }
 
     //Reporter and post'author is same person
     if (account._id.toString() === post.account_id.toString()) setAndSendResponse(res, responseError.UNKNOWN_ERROR);
@@ -706,7 +714,7 @@ postsController.like_post = expressAsyncHandler(async (req, res) => {
                         return element.account == author._id;
                     }) !== -1;
         }
-        if (isBlocked) return res.status(200).json({data: {is_blocked: "1"}});
+        if (isBlocked) return res.status(200).json({data: {is_blocked: true}});
 
         if (
             post?.likedAccounts.findIndex((element) => {
@@ -719,8 +727,14 @@ postsController.like_post = expressAsyncHandler(async (req, res) => {
                 {_id: id},
                 {$push: {likedAccounts: {_id: user._id}}}
             );
-            await Post.findOneAndUpdate({_id: id}, {$inc: {likes: 1}});
-            return setAndSendResponse(res, responseError.OK);
+            var updatedPost = await Post.findOneAndUpdate({_id: id}, {$inc: {likes: 1}}, { new: true });
+            res.status(responseError.OK.statusCode).json({
+                code: responseError.OK.body.code,
+                message: responseError.OK.body.message,
+                data: {
+                    likes: updatedPost.likes
+                }
+            });
         }
     } catch (err) {
         return setAndSendResponse(res, responseError.UNKNOWN_ERROR);
@@ -736,6 +750,7 @@ postsController.unlike_post = expressAsyncHandler(async (req, res) => {
     }
 
     if (req.account.isBlocked) return setAndSendResponse(res, responseError.NOT_ACCESS);
+
     try {
         let post = await Post.findById(id);
         if (post == null) {
@@ -756,8 +771,14 @@ postsController.unlike_post = expressAsyncHandler(async (req, res) => {
                 {_id: id},
                 {$pull: {likedAccounts: user._id}}
             );
-            await Post.findOneAndUpdate({_id: id}, {$inc: {likes: -1}});
-            return setAndSendResponse(res, responseError.OK);
+            var updatedPost = await Post.findOneAndUpdate({_id: id}, {$inc: {likes: -1}}, { new: true });
+            res.status(responseError.OK.statusCode).json({
+                code: responseError.OK.body.code,
+                message: responseError.OK.body.message,
+                data: {
+                    likes: updatedPost.likes
+                }
+            });
         }
     } catch (err) {
         return setAndSendResponse(res, responseError.UNKNOWN_ERROR);

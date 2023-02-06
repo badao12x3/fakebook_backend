@@ -26,11 +26,11 @@ videosController.get_video = expressAsyncHandler(async (req, res) => {
             url: video.video.url,
             publicId: video.video.publicId
         },
-        isAdsCampaign: video.isAdsCampaign ? '1' : '0',
+        isAdsCampaign: video.isAdsCampaign,
         createdAt: video.createdAt.toString(),
         updatedAt: video.updatedAt.toString(),
         likes: video.likes,
-        is_liked: video.likedAccounts.includes(req.account._id) ? '1' : '0',
+        is_liked: video.likedAccounts.includes(req.account._id),
     };
     res.status(responseError.OK.statusCode).json({
         code: responseError.OK.body.code,
@@ -53,11 +53,11 @@ videosController.get_list_videos = expressAsyncHandler(async (req, res) => {
                     url: video.video.url,
                     publicId: video.video.publicId
                 },
-                isAdsCampaign: video.isAdsCampaign ? '1' : '0',
+                isAdsCampaign: video.isAdsCampaign,
                 createdAt: video.createdAt.toString(),
                 updatedAt: video.updatedAt.toString(),
                 likes: video.likes,
-                is_liked: video.likedAccounts.includes(req.account._id) ? '1' : '0',
+                is_liked: video.likedAccounts.includes(req.account._id),
             }
         })
     }

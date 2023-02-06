@@ -39,9 +39,9 @@ const postSchema = new mongoose.Schema({
         default: true
     },
     banned: {
-        type: String,
+        type: Boolean,
         required: true,
-        default: '0'
+        default: false
     },
     reports_post: [{
         type: mongoose.Schema.Types.ObjectId,

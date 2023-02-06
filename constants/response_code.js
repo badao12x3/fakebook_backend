@@ -90,18 +90,18 @@ const responseError = {
             message: "Action has been done previously by this user"
         }
     },
-    POST_IS_NOT_EXISTED: {
-        statusCode: 400, // fix and restore // sử dụng 204 sẽ không trả về bất kì kết quả nào
-        body: {
-            code: "9991",
-            message: "Post is not existed"
-        }
-    },
     POST_IS_BANNED: {
         statusCode: 400,
         body: {
-            code: "9992",
+            code: "9991",
             message: "Post is banned"
+        }
+    },
+    POST_IS_NOT_EXISTED: {
+        statusCode: 400, // fix and restore // sử dụng 204 sẽ không trả về bất kì kết quả nào
+        body: {
+            code: "9992",
+            message: "Post is not existed"
         }
     },
     VIDEO_IS_NOT_EXISTED: {

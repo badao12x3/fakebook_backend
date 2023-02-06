@@ -56,7 +56,7 @@ commentController.get_comment = expressAsyncHandler(async (req, res) => {
     const post = await Post.findById(id);
 
     if (post == null) return setAndSendResponse(res, responseError.POST_IS_NOT_EXISTED);
-    if (post.banned === "true") return setAndSendResponse(res, responseError.POST_IS_BANNED);
+    if (post.banned) return setAndSendResponse(res, responseError.POST_IS_BANNED);
 
     //Check User is being blocked by Post's author
     const postAuthor = await Account.findById(post.account_id);
@@ -117,7 +117,7 @@ commentController.set_comment = expressAsyncHandler(async (req, res) => {
         let post = await Post.findById(id);
 
         if (post == null) return setAndSendResponse(res, responseError.POST_IS_NOT_EXISTED);
-        if (post.banned === "true") return setAndSendResponse(res, responseError.POST_IS_BANNED);
+        if (post.banned) return setAndSendResponse(res, responseError.POST_IS_BANNED);
 
         //Check User is being blocked by Post's author
         const postAuthor = await Account.findById(post.account_id);
