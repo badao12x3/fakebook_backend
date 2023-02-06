@@ -93,7 +93,7 @@ const responseError = {
     POST_IS_NOT_EXISTED: {
         statusCode: 400, // fix and restore // sử dụng 204 sẽ không trả về bất kì kết quả nào
         body: {
-            code: "9992",
+            code: "9991",
             message: "Post is not existed"
         }
     },
@@ -163,57 +163,57 @@ const responseError = {
     HAS_BEEN_FRIEND: {
         statusCode: 400,
         body: {
-            code: "402",
-            message: "has been friend"
+            code: "501",
+            message: "Has been friend"
         }
     },
     HAS_BLOCK: {
         statusCode: 400,
         body: {
-            code: "402",
-            message: "blocked each other"
+            code: "502",
+            message: "Blocked each other"
         }
     },
 
     DEL_REQUEST_FRIEND_FAILED: {
         statusCode: 400,
         body: {
-            code: "402",
-            message: "failed to delete request friend"
+            code: "503",
+            message: "Failed to delete request friend"
         }
     },
     ACCECPT_REQUEST_FRIEND_FAILED: {
         statusCode: 400,
         body: {
-            code: "402",
-            message: "failed to accept request friend"
+            code: "504",
+            message: "Failed to accept request friend"
         }
     },
     SET_REQUEST_FRIEND_FAILED: {
         statusCode: 400,
         body: {
-            code: "402",
+            code: "505",
             message: "failed to set request friend"
         }
     },
     HAS_BEEN_LIKED: {
         statusCode: 400,
         body: {
-            code: "402",
-            message: "has been liked",
+            code: "506",
+            message: "Has been liked",
         },
     },
     HAS_NOT_BEEN_LIKED: {
         statusCode: 400,
         body: {
-            code: "402",
-            message: "has not been liked",
+            code: "507",
+            message: "Has not been liked",
         },
     },
     PASSWORD_IS_INCORRECT: {
         statusCode: 400,
         body: {
-            code: "402",
+            code: "508",
             message: "Password is incorrect",
         },
     }
