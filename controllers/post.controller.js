@@ -71,8 +71,8 @@ postsController.get_post = expressAsyncHandler(async (req, res) => {
         let result = {
             id: post._id,
             described: post.described,
-            createdAt: post.createdAt.toString(),
-            updatedAt: post.updatedAt.toString(),
+            createdAt: post.createdAt,
+            updatedAt: post.updatedAt,
             likes: post.likes,
             comments: post.comments,
             author: {
@@ -152,8 +152,8 @@ postsController.get_list_posts = expressAsyncHandler(async (req, res) => {
                 let subResult = {
                     id: post._id,
                     described: post.described,
-                    createdAt: post.createdAt.toString(),
-                    updatedAt: post.updatedAt.toString(),
+                    createdAt: post.createdAt,
+                    updatedAt: post.updatedAt,
                     likes: post.likes,
                     comments: post.comments,
                     author: {
@@ -693,10 +693,16 @@ postsController.like_post = expressAsyncHandler(async (req, res) => {
 
     try {
         let post = await Post.findById(id);
-
         if (post == null) {
             return setAndSendResponse(res, responseError.POST_IS_NOT_EXISTED);
         }
+
+        // bài viết bị khóa
+        if (post.banned) {
+            // console.log("bài viết bị khóa");
+            return setAndSendResponse(res, responseError.POST_IS_BANNED);
+        }
+
         let author = await Account.findOne({_id: post.account_id}).exec();
         if (author == null) setAndSendResponse(res, responseError.NO_DATA);
         let user = req.account;
@@ -705,16 +711,16 @@ postsController.like_post = expressAsyncHandler(async (req, res) => {
         if (author?.blockedAccounts.length != 0)
             isBlocked =
                 author?.blockedAccounts.findIndex((element) => {
-                    return element.account == user._id;
+                    return element.account.toString() === user._id.toString();
                 }) !== -1;
         if (!isBlocked) {
             if (user?.blockedAccounts.length != 0)
                 isBlocked =
                     user?.blockedAccounts?.findIndex((element) => {
-                        return element.account == author._id;
+                        return element.account.toString() === author._id.toString();
                     }) !== -1;
         }
-        if (isBlocked) return res.status(200).json({data: {is_blocked: true}});
+        if (isBlocked) return callRes(res, responseError.NOT_ACCESS, 'Người viết đã chặn bạn / Bạn chặn người viết, do đó không thể like bài viết');
 
         if (
             post?.likedAccounts.findIndex((element) => {
@@ -756,6 +762,13 @@ postsController.unlike_post = expressAsyncHandler(async (req, res) => {
         if (post == null) {
             return setAndSendResponse(res, responseError.POST_IS_NOT_EXISTED);
         }
+
+        // bài viết bị khóa
+        if (post.banned) {
+            // console.log("bài viết bị khóa");
+            return setAndSendResponse(res, responseError.POST_IS_BANNED);
+        }
+
         let author = await Account.findOne({_id: post.account_id}).exec();
         if (author == null) setAndSendResponse(res, responseError.NO_DATA);
         let user = req.account;

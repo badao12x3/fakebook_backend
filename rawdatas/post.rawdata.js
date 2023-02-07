@@ -42,13 +42,7 @@ const posts = [
                 filename: "",
                 url: "http://dummyimage.com/266x279.png/76937e/ffffff",
                 publicId: "",
-            },
-            {
-                _id: "63ddd33e5fa9cf5634bb280b",
-                filename: "",
-                url: "http://dummyimage.com/167x271.png/fdd7d5/000000",
-                publicId: "",
-            },
+            }
         ],
         status: "căng thẳng",
         __v: 0,
@@ -67,7 +61,6 @@ const posts = [
         account_id: "63bbff18fc13ae6493000831",
         described:
             "The beautiful dog calmly slept because some bird slowly kicked down a slimy clock which, became a vibrating, vibrating teacher.",
-        images: [],
         status: "tốt",
         __v: 0,
         createdAt: "2023-02-04T03:38:38.607Z",
@@ -93,7 +86,6 @@ const posts = [
         account_id: "63bbff18fc13ae6493000830",
         described:
             "The rough hamster calmly killed because some teacher humbly rolled below a vibrating boy which, became a vibrating, slimy professor.",
-        images: [],
         status: "rùng mình",
         __v: 0,
         createdAt: "2023-02-04T03:38:38.607Z",
@@ -127,13 +119,7 @@ const posts = [
                 filename: "",
                 url: "http://dummyimage.com/273x271.png/2016da/ffffff",
                 publicId: "",
-            },
-            {
-                _id: "63ddd33e5fa9cf5634bb2810",
-                filename: "",
-                url: "http://dummyimage.com/167x253.png/4ce00f/ffffff",
-                publicId: "",
-            },
+            }
         ],
         status: "ngại ngùng",
         __v: 0,
@@ -223,7 +209,7 @@ const posts = [
     {
         video: {
             filename: "",
-            url: "http://dummyimage.com/105x230.png/b1086b/ffffff",
+            url: "https://www.youtube.com/watch?v=j5-yKhDd64s",
             publicId: "",
         },
         likedAccounts: [
@@ -237,13 +223,12 @@ const posts = [
         likes: 5,
         comments: 2,
         canComment: true,
-        banned: true,
+        banned: false,
         reports_post: [],
         _id: "63ddd33e5fa9cf5634bb281a",
         account_id: "63bbff18fc13ae6493000830",
         described:
             "The hot hamster quickly killed because some professor shockingly breathed through a vibrating teacher which, became a lovely, slimy plastic.",
-        images: [],
         status: "buồn ngủ",
         __v: 0,
         createdAt: "2023-02-04T03:38:38.608Z",
@@ -267,7 +252,6 @@ const posts = [
         account_id: "63bbff18fc13ae649300082c",
         described:
             "The professional old lady sadly died because some boy precisely flew up a soft dog which, became a dumb, soft plastic.",
-        images: [],
         status: "kỳ lạ",
         __v: 0,
         createdAt: "2023-02-04T03:38:38.608Z",
@@ -327,7 +311,6 @@ const posts = [
         account_id: "63bbff18fc13ae649300082b",
         described:
             "The rough duck calmly ran because some teacher humbly rolled below a dumb hamster which, became a vibrating, lazy hamster.",
-        images: [],
         status: "trống vắng",
         __v: 0,
         createdAt: "2023-02-04T03:38:38.608Z",
