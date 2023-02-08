@@ -19,11 +19,12 @@ const authToken = expressAsyncHandler(async (req, res, next) => {
         try {
             const decoded = jwt.verify(token, JWT_SECRET);
             req.account = await Account.findById(decoded.account_id).select("-password");
+            // let account = await Account.findById(decoded.account_id);
+            // req.account = account;
             next(); // next để gọi tiếp hàm sau
         } catch (error) {
             return setAndSendResponse(res, responseError.NOT_AUTHORIZED_TOKEN_FAILED);
         }
-
     }
 })
 

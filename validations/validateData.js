@@ -26,9 +26,13 @@ function isValidPassword(password){
 }
 
 function isNumber(num){
-    const regNum = /^-?\d+$/;
+    const regNum = /^\d+$/;
     return regNum.test(num);
 }
+// function isNumber(num){
+//     const regNum = /^-?\d+$/;
+//     return regNum.test(num);
+// }
 
 function isValidId(id){
     const regId = /^[0-9a-fA-F]{24}$/;
@@ -56,7 +60,12 @@ function checkLink (link) {
     let result = banLink.filter(e => link.includes(e));
     if (result.length > 0) return false;
     else return true;
-  }
+}
+
+function isGender(gender) {
+    return ["Male", "Female", "Secret"].includes(gender);
+}
+
 module.exports = {
     isValidName,
     isValidPassword,
@@ -64,5 +73,9 @@ module.exports = {
     isValidId,
     isNumber,
     isValidCoordinates,
-    checkLink
+    checkLink,
+    isGender
 }
+
+
+

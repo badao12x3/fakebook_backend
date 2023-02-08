@@ -11,12 +11,12 @@ const videosController = {};
 videosController.get_video = expressAsyncHandler(async (req, res) => {
     const id = req.params.id;
     // chưa tìm được cách nhập /:id mà trả về undefined
-    if(id === undefined) return setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
-    if(!isValidId(id)){
+    if (id === undefined) return setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
+    if (!isValidId(id)) {
         return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
     }
     let video = await Video.findById(id);
-    if(video == null){
+    if (video == null) {
         return setAndSendResponse(res, responseError.VIDEO_IS_NOT_EXISTED);
     }
     const result = {
@@ -26,22 +26,22 @@ videosController.get_video = expressAsyncHandler(async (req, res) => {
             url: video.video.url,
             publicId: video.video.publicId
         },
-        isAdsCampaign: video.isAdsCampaign ? '1' : '0',
+        isAdsCampaign: video.isAdsCampaign,
         createdAt: video.createdAt.toString(),
         updatedAt: video.updatedAt.toString(),
         likes: video.likes,
-        is_liked: video.likedAccounts.includes(req.account._id) ? '1' : '0',
+        is_liked: video.likedAccounts.includes(req.account._id),
     };
-    res.json({
-        code: responseError.OK.statusCode,
-        message: responseError.OK.body,
+    res.status(responseError.OK.statusCode).json({
+        code: responseError.OK.body.code,
+        message: responseError.OK.body.message,
         data: result
     });
 });
 
 videosController.get_list_videos = expressAsyncHandler(async (req, res) => {
     const videos = await Video.find();
-    if(videos == null){
+    if (videos == null) {
         return setAndSendResponse(res, responseError.VIDEO_IS_NOT_EXISTED);
     }
     const result = {
@@ -53,17 +53,17 @@ videosController.get_list_videos = expressAsyncHandler(async (req, res) => {
                     url: video.video.url,
                     publicId: video.video.publicId
                 },
-                isAdsCampaign: video.isAdsCampaign ? '1' : '0',
+                isAdsCampaign: video.isAdsCampaign,
                 createdAt: video.createdAt.toString(),
                 updatedAt: video.updatedAt.toString(),
                 likes: video.likes,
-                is_liked: video.likedAccounts.includes(req.account._id) ? '1' : '0',
+                is_liked: video.likedAccounts.includes(req.account._id),
             }
         })
     }
-    res.json({
-        code: responseError.OK.statusCode,
-        message: responseError.OK.body,
+    res.status(responseError.OK.statusCode).json({
+        code: responseError.OK.body.code,
+        message: responseError.OK.body.message,
         data: result
     });
 });

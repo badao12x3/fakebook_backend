@@ -90,6 +90,13 @@ const responseError = {
             message: "Action has been done previously by this user"
         }
     },
+    POST_IS_BANNED: {
+        statusCode: 400,
+        body: {
+            code: "9991",
+            message: "Post is banned"
+        }
+    },
     POST_IS_NOT_EXISTED: {
         statusCode: 400, // fix and restore // sử dụng 204 sẽ không trả về bất kì kết quả nào
         body: {
@@ -156,63 +163,82 @@ const responseError = {
     HAS_BEEN_FRIEND: {
         statusCode: 400,
         body: {
-            code: "402",
-            message: "has been friend"
+            code: "501",
+            message: "Has been friend"
         }
     },
     HAS_BLOCK: {
         statusCode: 400,
         body: {
-            code: "402",
-            message: "blocked each other"
+            code: "502",
+            message: "Blocked each other"
         }
     },
 
     DEL_REQUEST_FRIEND_FAILED: {
         statusCode: 400,
         body: {
-            code: "402",
-            message: "failed to delete request friend"
+            code: "503",
+            message: "Failed to delete request friend"
         }
     },
-
     ACCECPT_REQUEST_FRIEND_FAILED: {
         statusCode: 400,
         body: {
-            code: "402",
-            message: "failed to accept request friend"
+            code: "504",
+            message: "Failed to accept request friend"
         }
     },
-
     SET_REQUEST_FRIEND_FAILED: {
         statusCode: 400,
         body: {
-            code: "402",
+            code: "505",
             message: "failed to set request friend"
         }
     },
+    HAS_BEEN_LIKED: {
+        statusCode: 400,
+        body: {
+            code: "506",
+            message: "Has been liked",
+        },
+    },
+    HAS_NOT_BEEN_LIKED: {
+        statusCode: 400,
+        body: {
+            code: "507",
+            message: "Has not been liked",
+        },
+    },
+    PASSWORD_IS_INCORRECT: {
+        statusCode: 400,
+        body: {
+            code: "508",
+            message: "Password is incorrect",
+        },
+    }
 
 }
 
 function setAndSendResponse(res, responseError) {
-  return res.status(responseError.statusCode).send(responseError.body);
+    return res.status(responseError.statusCode).send(responseError.body);
 }
 
 function callRes(res, responseErrorName, data=null) {
     if (responseErrorName != responseError.OK) {
         let x = {
-          code: responseErrorName.body.code,
-          message: responseErrorName.body.message,
-          details: null
+            code: responseErrorName.body.code,
+            message: responseErrorName.body.message,
+            details: null
         }
         if (data) x.details = data.toString();
         return res.status(responseErrorName.statusCode).json(x);
     }
     else {
         let x = {
-          code: responseErrorName.body.code,
-          message: responseErrorName.body.message,
-          data: data
+            code: responseErrorName.body.code,
+            message: responseErrorName.body.message,
+            data: data
         }
         return res.status(responseErrorName.statusCode).json(x);
     }
