@@ -58,6 +58,7 @@ const accountSchema = new mongoose.Schema({
   active: {
     type: Boolean,
     require: false,
+    default: false,
   },
   description: {
     type: String,

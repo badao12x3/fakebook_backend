@@ -12,7 +12,7 @@ const Report = require('../models/report.model');
 
 const {isNumber, isValidId} = require("../validations/validateData");
 
- //import cloud storage
+//import cloud storage
 const cloudinary = require('../config/cloudinaryConfig')
 
 const MAX_IMAGE_NUMBER = 4;
@@ -21,19 +21,19 @@ const MAX_VIDEO_NUMBER = 1;
 const MAX_SIZE_VIDEO = 10 * 1024 * 1024; // for 10MB
 const MAX_WORD_POST = 500;
 const statusArray = ['hạnh phúc', 'có phúc', 'được yêu', 'buồn', 'đáng yêu', 'biết ơn', 'hào hứng', 'đang yêu', 'điên', 'cảm kích', 'sung sướng',
-                    'tuyệt vời', 'ngốc nghếch', 'vui vẻ', 'tuyệt vời', 'thật phong cách', 'thú vị', 'thư giãn', 'positive', 'rùng mình',
-                    'đầy hi vọng', 'hân hoan', 'mệt mỏi', 'có động lực', 'proud', 'chỉ có một mình', 'chu đáo', 'OK', 'nhớ nhà', 'giận dữ',
-                    'ốm yếu', 'hài lòng', 'kiệt sức', 'xúc động', 'tự tin', 'rất tuyệt', 'tươi mới', 'quyết đoán', 'kiệt sức', 'bực mình',
-                    'vui vẻ', 'gặp may', 'đau khổ', 'buồn tẻ', 'buồn ngủ', 'tràn đầy sinh lực', 'đói', 'chuyên nghiệp', 'đau đớn', 'thanh thản',
-                    'thất vọng', 'lạc quan', 'lạnh', 'dễ thương', 'tuyệt cú mèo', 'thật tuyệt', 'hối tiếc', 'thật giỏi', 'lo lắng', 'vui nhộn',
-                    'tồi tệ', 'xuống tinh thần', 'đầy cảm hứng', 'hài lòng', 'phấn khích', 'bình tĩnh', 'bối rối', 'goofy', 'trống vắng', 'tốt',
-                    'mỉa mai', 'cô đơn', 'mạnh mẽ', 'lo lắng', 'đặc biệt', 'chán nản', 'vui vẻ', 'tò mò', 'ủ dột', 'được chào đón', 'gục ngã',
-                    'xinh đẹp', 'tuyệt vời', 'cáu', 'căng thẳng', 'thiếu', 'kích động', 'tinh quái', 'kinh ngạc', 'tức giận', 'buồn chán',
-                    'bối rồi', 'mạnh mẽ', 'phẫn nộ', 'mới mẻ', 'thành công', 'ngạc nhiên', 'bối rối', 'nản lòng', 'tẻ nhạt', 'xinh xắn',
-                    'khá hơn', 'tội lỗi', 'an toàn', 'tự do', 'hoang mang', 'già nua', 'lười biếng', 'tồi tệ hơn', 'khủng khiếp', 'thoải mái',
-                    'ngớ ngẩn', 'hổ thẹn', 'kinh khủng', 'đang ngủ', 'khỏe', 'nhanh nhẹn', 'ngại ngùng', 'gay go', 'kỳ lạ', 'như con người',
-                    'bị tổn thương', 'khủng khiếp'
-                    ];
+    'tuyệt vời', 'ngốc nghếch', 'vui vẻ', 'tuyệt vời', 'thật phong cách', 'thú vị', 'thư giãn', 'positive', 'rùng mình',
+    'đầy hi vọng', 'hân hoan', 'mệt mỏi', 'có động lực', 'proud', 'chỉ có một mình', 'chu đáo', 'OK', 'nhớ nhà', 'giận dữ',
+    'ốm yếu', 'hài lòng', 'kiệt sức', 'xúc động', 'tự tin', 'rất tuyệt', 'tươi mới', 'quyết đoán', 'kiệt sức', 'bực mình',
+    'vui vẻ', 'gặp may', 'đau khổ', 'buồn tẻ', 'buồn ngủ', 'tràn đầy sinh lực', 'đói', 'chuyên nghiệp', 'đau đớn', 'thanh thản',
+    'thất vọng', 'lạc quan', 'lạnh', 'dễ thương', 'tuyệt cú mèo', 'thật tuyệt', 'hối tiếc', 'thật giỏi', 'lo lắng', 'vui nhộn',
+    'tồi tệ', 'xuống tinh thần', 'đầy cảm hứng', 'hài lòng', 'phấn khích', 'bình tĩnh', 'bối rối', 'goofy', 'trống vắng', 'tốt',
+    'mỉa mai', 'cô đơn', 'mạnh mẽ', 'lo lắng', 'đặc biệt', 'chán nản', 'vui vẻ', 'tò mò', 'ủ dột', 'được chào đón', 'gục ngã',
+    'xinh đẹp', 'tuyệt vời', 'cáu', 'căng thẳng', 'thiếu', 'kích động', 'tinh quái', 'kinh ngạc', 'tức giận', 'buồn chán',
+    'bối rồi', 'mạnh mẽ', 'phẫn nộ', 'mới mẻ', 'thành công', 'ngạc nhiên', 'bối rối', 'nản lòng', 'tẻ nhạt', 'xinh xắn',
+    'khá hơn', 'tội lỗi', 'an toàn', 'tự do', 'hoang mang', 'già nua', 'lười biếng', 'tồi tệ hơn', 'khủng khiếp', 'thoải mái',
+    'ngớ ngẩn', 'hổ thẹn', 'kinh khủng', 'đang ngủ', 'khỏe', 'nhanh nhẹn', 'ngại ngùng', 'gay go', 'kỳ lạ', 'như con người',
+    'bị tổn thương', 'khủng khiếp'
+];
 
 
 function countWord(str) {
@@ -44,30 +44,35 @@ const postsController = {};
 postsController.get_post = expressAsyncHandler(async (req, res) => {
     const id = req.params.id;
     // chưa tìm được cách nhập /:id mà trả về undefined
-    if(id === undefined) return setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
-    if(!isValidId(id)){
+    if (id === undefined) return setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
+    if (!isValidId(id)) {
         return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
     }
 
     try {
         let post = await Post.findById(id);
-        if(post == null){
+        if (post == null) {
             return setAndSendResponse(res, responseError.POST_IS_NOT_EXISTED);
         }
 
-        if(post.banned == '1'){
-            return callRes(res, responseError.NOT_ACCESS, 'Bài viết đã bị khóa do vi phạm cộng đồng');
+        // bài viết bị khóa
+        if (post.banned) {
+            // console.log("bài viết bị khóa");
+            return setAndSendResponse(res, responseError.POST_IS_BANNED);
         }
+
         let author = await Account.findOne({_id: post.account_id}).exec();
 
-        const isBlocked = author.blockedAccounts.findIndex((element) => {return element.account.toString() === req.account._id.toString()}) !== -1;
-        if(isBlocked) return callRes(res, responseError.NOT_ACCESS, 'Người viết đã chặn bạn, do đó không thể lấy thông tin bài viết');
+        const isBlocked = author.blockedAccounts.findIndex((element) => {
+            return element.account.toString() === req.account._id.toString()
+        }) !== -1;
+        if (isBlocked) return callRes(res, responseError.NOT_ACCESS, 'Người viết đã chặn bạn, do đó không thể lấy thông tin bài viết');
 
         let result = {
             id: post._id,
             described: post.described,
-            createdAt: post.createdAt.toString(),
-            updatedAt: post.updatedAt.toString(),
+            createdAt: post.createdAt,
+            updatedAt: post.updatedAt,
             likes: post.likes,
             comments: post.comments,
             author: {
@@ -75,20 +80,20 @@ postsController.get_post = expressAsyncHandler(async (req, res) => {
                 name: author.name,
                 avatar: author.getAvatar()
             },
-            is_liked: post.likedAccounts.includes(req.account._id) ? '1' : '0',
+            is_liked: post.likedAccounts.includes(req.account._id),
             status: post.status,
-            is_blocked: isBlocked ? '1' : '0',
-            can_edit: req.account._id.equals(author._id) ? (post.banned ? '0':'1') : '0',
+            is_blocked: isBlocked,
+            can_edit: req.account._id.equals(author._id) ? (post.banned ? false : true) : false,
             banned: post.banned,
-            can_comment: post.canComment ? '1' : '0'
+            can_comment: post.canComment
         };
-        if(post.images.length !== 0){
-            result.images = post.images.map((image)=> {
+        if (post.images.length !== 0) {
+            result.images = post.images.map((image) => {
                 let {url, publicId} = image;
                 return {url: url, publicId: publicId};
             });
         }
-        if(post.video && post.video.url != undefined){
+        if (post.video && post.video.url != undefined) {
             result.video = {
                 url: post.video.url,
                 publicId: post.getVideoThumb()
@@ -100,7 +105,7 @@ postsController.get_post = expressAsyncHandler(async (req, res) => {
             message: responseError.OK.body.message,
             data: result
         });
-    }catch(err) {
+    } catch (err) {
         return setAndSendResponse(res, responseError.UNKNOWN_ERROR);
     }
 });
@@ -109,13 +114,13 @@ postsController.get_list_posts = expressAsyncHandler(async (req, res) => {
     var {index, count, last_id} = req.query;
     // console.log(req.query)
 
-    if(!index || !count) return setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
+    if (!index || !count) return setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
     index = parseInt(index);
     count = parseInt(count);
-    if(!isNumber(index) || !isNumber(count) || index < 0 || count < 1)  return setAndSendResponse(res, responseError.PARAMETER_TYPE_IS_INVALID);
+    if (!isNumber(index) || !isNumber(count) || index < 0 || count < 1) return setAndSendResponse(res, responseError.PARAMETER_TYPE_IS_INVALID);
 
     // người dùng bị khóa tài khoản
-    if(req.account.isBlocked) return setAndSendResponse(res, responseError.NOT_ACCESS);
+    if (req.account.isBlocked) return setAndSendResponse(res, responseError.NOT_ACCESS);
 
     try {
         const posts = await Post.find().populate({path: 'account_id', model: Account}).sort("-createdAt");
@@ -147,8 +152,8 @@ postsController.get_list_posts = expressAsyncHandler(async (req, res) => {
                 let subResult = {
                     id: post._id,
                     described: post.described,
-                    createdAt: post.createdAt.toString(),
-                    updatedAt: post.updatedAt.toString(),
+                    createdAt: post.createdAt,
+                    updatedAt: post.updatedAt,
                     likes: post.likes,
                     comments: post.comments,
                     author: {
@@ -156,12 +161,12 @@ postsController.get_list_posts = expressAsyncHandler(async (req, res) => {
                         name: post.account_id.name,
                         avatar: post.account_id.getAvatar()
                     },
-                    is_liked: post.likedAccounts.includes(req.account._id) ? '1' : '0',
+                    is_liked: post.likedAccounts.includes(req.account._id),
                     status: post.status,
-                    is_blocked: isBlocked ? '1' : '0',
-                    can_edit: req.account._id.equals(post.account_id._id) ? (post.banned ? '0' : '1') : '0',
+                    is_blocked: isBlocked,
+                    can_edit: req.account._id.equals(post.account_id._id) ? (post.banned ? false : true) : false,
                     banned: post.banned,
-                    can_comment: post.canComment ? '1' : '0'
+                    can_comment: post.canComment
                 };
                 if (post.images.length !== 0) {
                     subResult.images = post.images.map((image) => {
@@ -177,7 +182,7 @@ postsController.get_list_posts = expressAsyncHandler(async (req, res) => {
                 }
                 return subResult;
             }),
-            new_items: (index_last_id + 1 - index).toString(),
+            new_items: (index_last_id + 1 - index),
 
         }
         if (slicePosts.length > 0) {
@@ -188,17 +193,17 @@ postsController.get_list_posts = expressAsyncHandler(async (req, res) => {
             message: responseError.OK.body.message,
             data: result
         });
-    }catch(err) {
+    } catch (err) {
         return setAndSendResponse(res, responseError.UNKNOWN_ERROR);
     }
 });
 
-postsController.add_post = expressAsyncHandler( async (req, res) => {
+postsController.add_post = expressAsyncHandler(async (req, res) => {
     var {described, status} = req.body;
 
     // console.log(req.body);
     let image, video;
-    if (req.files){
+    if (req.files) {
         image = req.files.image;
         video = req.files.video
     }
@@ -207,46 +212,46 @@ postsController.add_post = expressAsyncHandler( async (req, res) => {
     //     console.log("thiếu described hoặc status");
     //     return setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
     // }
-    
-    
+
+
     //không có nội dung, ảnh và video
-    if(!described && !image && !video){
+    if (!described && !image && !video) {
         // console.log("không có nội dung, ảnh và video, hãy thêm ít nhất 1 trong 3 trường");
         return setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
     }
 
-    
+
     //Dữ liệu sai
-    if((described && typeof described !== "string") || (status && typeof status !== "string")) {
+    if ((described && typeof described !== "string") || (status && typeof status !== "string")) {
         // console.log("described ko phải string");
         return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID)
     }
 
-    if(described && countWord(described) > MAX_WORD_POST) {
+    if (described && countWord(described) > MAX_WORD_POST) {
         // console.log("described lớn hơn 500 kí tự");
         return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID)
     }
 
-    if(status && !statusArray.includes(status)) {
+    if (status && !statusArray.includes(status)) {
         // console.log("status ko nằm trong dãy các status mặc định");
         return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID)
     }
 
     //có cả ảnh và video
-    if(req.files && image && video){
+    if (req.files && image && video) {
         // console.log("có cả ảnh và video => từ chối");
         return setAndSendResponse(res, responseError.UPLOAD_FILE_FAILED);
     }
 
     let post = new Post();
 
-    if(image) {  //upload ảnh
+    if (image) {  //upload ảnh
         // middleware đã check nhưng chung cho cả video và ảnh nên check lại
-        if(image.length > MAX_IMAGE_NUMBER) {
+        if (image.length > MAX_IMAGE_NUMBER) {
             return setAndSendResponse(res, responseError.MAXIMUM_NUMBER_OF_IMAGES);
         }
 
-        for(const item_image of image) {
+        for (const item_image of image) {
             // middleware đã check rồi, nên không cần nữa
             // const filetypes  = /jpeg|jpg|png/;
             // const mimetype = filetypes.test(item_image.mimetype);
@@ -255,34 +260,34 @@ postsController.add_post = expressAsyncHandler( async (req, res) => {
             //     return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
             // }
 
-            if(item_image.buffer.bytelength > MAX_SIZE_IMAGE) {
+            if (item_image.buffer.bytelength > MAX_SIZE_IMAGE) {
                 return setAndSendResponse(res, responseError.FILE_SIZE_IS_TOO_BIG);
             }
         }
 
-    
-        try{
+
+        try {
             let uploadPromises = image.map(cloudinary.uploads);
             let data = await Promise.all(uploadPromises);
             //xửa lý data
             post.images = data;
-        }catch(err){
+        } catch (err) {
             //lỗi không xác định
             // console.log(err);
             return setAndSendResponse(res, responseError.UPLOAD_FILE_FAILED);
         }
     }
 
-    if(video) { //upload video
-        if(video.length > MAX_VIDEO_NUMBER) {
+    if (video) { //upload video
+        if (video.length > MAX_VIDEO_NUMBER) {
             // console.log("MAX_VIDEO_NUMBER");
             return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
         }
 
-        for(const item_video of video) {
+        for (const item_video of video) {
             const filetypes = /mp4/;
             const mimetype = filetypes.test(item_video.mimetype);
-            if(!mimetype) {
+            if (!mimetype) {
                 // console.log("Mimetype video is invalid");
                 return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
             }
@@ -297,7 +302,7 @@ postsController.add_post = expressAsyncHandler( async (req, res) => {
             //xử lý data
             post.video = data;
         } catch (error) {
-            //lỗi không xác định      
+            //lỗi không xác định
             return setAndSendResponse(res, responseError.UPLOAD_FILE_FAILED);
         }
     }
@@ -305,7 +310,7 @@ postsController.add_post = expressAsyncHandler( async (req, res) => {
     post.account_id = req.account._id;
     post.described = described;
     post.status = status;
-    
+
 
     try {
         const savedPost = await post.save();
@@ -324,24 +329,24 @@ postsController.add_post = expressAsyncHandler( async (req, res) => {
 });
 
 postsController.delete_post = expressAsyncHandler(async (req, res) => {
-    const id  = req.params.id;
+    const id = req.params.id;
 
     // console.log(id);
 
     // PARAMETER_IS_NOT_ENOUGH
-    if(id !== 0 && !id) {
+    if (id !== 0 && !id) {
         // console.log("No have parameter id");
         return setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
     }
-    
+
     // PARAMETER_TYPE_IS_INVALID
-    if(id && !isValidId(id)) {
+    if (id && !isValidId(id)) {
         // console.log("PARAMETER_TYPE_IS_INVALID");
         return setAndSendResponse(res, responseError.PARAMETER_TYPE_IS_INVALID);
     }
 
     // người dùng bị khóa tài khoản
-    if(req.account.isBlocked) return setAndSendResponse(res, responseError.NOT_ACCESS);
+    if (req.account.isBlocked) return setAndSendResponse(res, responseError.NOT_ACCESS);
 
     let post;
 
@@ -358,14 +363,14 @@ postsController.delete_post = expressAsyncHandler(async (req, res) => {
     }
 
     // bài viết bị khóa
-    if(post.banned == "1") {
+    if (post.banned) {
         // console.log("bài viết bị khóa");
-        return setAndSendResponse(res, responseError.POST_IS_NOT_EXISTED);
+        return setAndSendResponse(res, responseError.POST_IS_BANNED);
     }
 
     // console.log(post.account_id);
     // console.log(req.account._id);
-    if(!post.account_id.equals(req.account._id)) {
+    if (!post.account_id.equals(req.account._id)) {
         // console.log("Not Access");
         return setAndSendResponse(res, responseError.NOT_ACCESS);
     }
@@ -374,52 +379,52 @@ postsController.delete_post = expressAsyncHandler(async (req, res) => {
         await Post.findByIdAndDelete(id);
 
         try {
-            if(post.images.length > 0) {
-                for(let image of post.images) {                    
-                    cloudinary.removeImg(image.publicId);                                                       
+            if (post.images.length > 0) {
+                for (let image of post.images) {
+                    cloudinary.removeImg(image.publicId);
                 }
             }
-            if(post.video && post.video.publicId) cloudinary.removeVideo(post.video.publicId);
+            if (post.video && post.video.publicId) cloudinary.removeVideo(post.video.publicId);
         } catch (error) {
             // console.log("Khong xoa duoc anh hoặc video");
             return setAndSendResponse(res, responseError.EXCEPTION_ERROR);
         }
         // xóa comment
-		Comment.deleteMany({post_id: post._id});
+        Comment.deleteMany({post_id: post._id});
 
         setAndSendResponse(res, responseError.OK);
     } catch (error) {
         // console.log(error);
-		setAndSendResponse(res, responseError.CAN_NOT_CONNECT_TO_DB);
+        setAndSendResponse(res, responseError.CAN_NOT_CONNECT_TO_DB);
     }
 });
 
 postsController.edit_post = expressAsyncHandler(async (req, res) => {
-    var { id, status, image_del, described } = req.body;
+    var {id, status, image_del, described} = req.body;
     var image, video;
-    if(req.files) {
+    if (req.files) {
         image = req.files.image;
         video = req.files.video;
     }
     var user = req.account;
 
     // console.log(id, status, image_del, described, user);
-    if(image_del) {
-        
-        if(!Array.isArray(image_del)) {
+    if (image_del) {
+
+        if (!Array.isArray(image_del)) {
             try {
                 image_del = JSON.parse(image_del);
             } catch (err) {
                 // console.log("image_del parse loi PARAMETER_TYPE_IS_INVALID");
                 return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
             }
-            if(!Array.isArray(image_del)) {
+            if (!Array.isArray(image_del)) {
                 // console.log("image_del PARAMETER_TYPE_IS_INVALID");
                 return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
             }
         }
-        for(const id_image_del of image_del) {
-            if(typeof id_image_del !== "string") {
+        for (const id_image_del of image_del) {
+            if (typeof id_image_del !== "string") {
                 // console.log("image_del element PARAMETER_TYPE_IS_INVALID");
                 return setAndSendResponse(res, responseError.PARAMETER_TYPE_IS_INVALID);
             }
@@ -433,28 +438,28 @@ postsController.edit_post = expressAsyncHandler(async (req, res) => {
 
 
     // PARAMETER_IS_NOT_ENOUGH
-    if(id !== '' && !id) {
+    if (id !== '' && !id) {
         // console.log("No have parameter id");
         return setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
     }
 
     // PARAMETER_TYPE_IS_INVALID
-    if((id && typeof id !== "string") || (described && typeof described !== "string") || (status && typeof status !== "string")) {
+    if ((id && typeof id !== "string") || (described && typeof described !== "string") || (status && typeof status !== "string")) {
         // console.log("PARAMETER_TYPE_IS_INVALID");
         return setAndSendResponse(res, responseError.PARAMETER_TYPE_IS_INVALID);
     }
 
-    if(described && countWord(described) > MAX_WORD_POST) {
+    if (described && countWord(described) > MAX_WORD_POST) {
         // console.log("MAX_WORD_POST");
         return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
     }
 
-    if(status && !statusArray.includes(status)) {
+    if (status && !statusArray.includes(status)) {
         // console.log("Sai status");
         return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
     }
 
-    if(image && video) {
+    if (image && video) {
         // console.log("Có cả image and video gui di");
         return setAndSendResponse(res, responseError.UPLOAD_FILE_FAILED);
     }
@@ -475,32 +480,32 @@ postsController.edit_post = expressAsyncHandler(async (req, res) => {
     // console.log(post)
     // console.log(post.account_id)
     // console.log(user._id)
-    if(!post.account_id.equals(user._id)) {
+    if (!post.account_id.equals(user._id)) {
         // console.log("Not Access");
         return setAndSendResponse(res, responseError.NOT_ACCESS);
     }
 
     // Check gia tri image_del hop le
-    if(image_del && image_del.length > 0) {
-        for(const id_image_del of image_del) {
+    if (image_del && image_del.length > 0) {
+        for (const id_image_del of image_del) {
             let isInvalid = true;
-            for(const image of post.images) {
-                if(image._id == id_image_del) {
+            for (const image of post.images) {
+                if (image._id == id_image_del) {
                     isInvalid = false;
                 }
             }
-            if(isInvalid) {
+            if (isInvalid) {
                 // console.log("Sai id");
                 return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
             }
         }
 
         // Xoa anh
-        for(const id_image_del of image_del) {
+        for (const id_image_del of image_del) {
             // console.log("xoa anh");
             var i;
-            for(i=0; i < post.images.length; i++) {
-                if(post.images[i]._id == id_image_del) {
+            for (i = 0; i < post.images.length; i++) {
+                if (post.images[i]._id == id_image_del) {
                     break;
                 }
             }
@@ -516,21 +521,21 @@ postsController.edit_post = expressAsyncHandler(async (req, res) => {
 
     let promises, file;
 
-    if(video && !image) {
-        if(post.images.length != 0) {
+    if (video && !image) {
+        if (post.images.length != 0) {
             // console.log("Có video và ko có ảnh");
             return setAndSendResponse(res, responseError.UPLOAD_FILE_FAILED);
         }
 
-        if(video.length > MAX_VIDEO_NUMBER) {
+        if (video.length > MAX_VIDEO_NUMBER) {
             // console.log("MAX_VIDEO_NUMBER");
             return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
         }
 
-        for(const item_video of video) {
+        for (const item_video of video) {
             const filetypes = /mp4/;
             const mimetype = filetypes.test(item_video.mimetype);
-            if(!mimetype) {
+            if (!mimetype) {
                 // console.log("Mimetype video is invalid");
                 return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
             }
@@ -549,7 +554,7 @@ postsController.edit_post = expressAsyncHandler(async (req, res) => {
         //     post.video = data;
 
         try {
-            if(post.video.url) {
+            if (post.video.url) {
                 cloudinary.removeVideo(post.video.publicId);
             }
         } catch (err) {
@@ -568,9 +573,9 @@ postsController.edit_post = expressAsyncHandler(async (req, res) => {
         }
     }
 
-    if(image && !video) {
+    if (image && !video) {
         console.log("đến đây");
-        if(post.video.url) {
+        if (post.video.url) {
             // console.log("Có cả ảnh và video");
             return setAndSendResponse(res, responseError.UPLOAD_FILE_FAILED);
         }
@@ -589,7 +594,7 @@ postsController.edit_post = expressAsyncHandler(async (req, res) => {
         //     }
         // }
 
-        if(image.length + post.images.length > MAX_IMAGE_NUMBER) {
+        if (image.length + post.images.length > MAX_IMAGE_NUMBER) {
             // console.log("Max image number");
             return setAndSendResponse(res, responseError.MAXIMUM_NUMBER_OF_IMAGES);
         }
@@ -601,7 +606,7 @@ postsController.edit_post = expressAsyncHandler(async (req, res) => {
         try {
             // console.log("đến đây chưa");
             file = await Promise.all(promises);
-            for(let file_item of file) {
+            for (let file_item of file) {
                 post.images.push(file_item);
             }
             // let uploadPromises = image.map(cloudinary.uploads);
@@ -614,16 +619,16 @@ postsController.edit_post = expressAsyncHandler(async (req, res) => {
         }
     }
 
-    if(described) {
+    if (described) {
         // console.log("Have described");
-        if(countWord(described) > MAX_WORD_POST) {
+        if (countWord(described) > MAX_WORD_POST) {
             // console.log("MAX_WORD_POST");
             return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
         }
         post.described = described;
     }
 
-    if(status) {
+    if (status) {
         // console.log("Have status");
         post.status = status;
     }
@@ -645,20 +650,25 @@ postsController.report_post = expressAsyncHandler(async (req, res) => {
     const {id, subject, details} = req.body;
     const account = req.account;
 
-    if(!id || !subject || !details) setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
+    if (!id || !subject || !details) setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
 
-    if(!isValidId(id)) setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
+    if (!isValidId(id)) setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
 
     //Check user being blocked or not
-    if(account.isBlocked) setAndSendResponse(res, responseError.NOT_ACCESS);
+    if (account.isBlocked) setAndSendResponse(res, responseError.NOT_ACCESS);
 
     //Get post
     const post = await Post.findById(id);
-    if(post == null) setAndSendResponse(res, responseError.POST_IS_NOT_EXISTED);
-    if(post.banned === "true") setAndSendResponse(res, responseError.POST_IS_BANNED);
+    if (post == null) setAndSendResponse(res, responseError.POST_IS_NOT_EXISTED);
+
+    // bài viết bị khóa
+    if (post.banned) {
+        // console.log("bài viết bị khóa");
+        return setAndSendResponse(res, responseError.POST_IS_BANNED);
+    }
 
     //Reporter and post'author is same person
-    if(account._id.toString() === post.account_id.toString()) setAndSendResponse(res, responseError.UNKNOWN_ERROR);
+    if (account._id.toString() === post.account_id.toString()) setAndSendResponse(res, responseError.UNKNOWN_ERROR);
 
     await new Report({
         reporter_id: account._id,
@@ -671,4 +681,122 @@ postsController.report_post = expressAsyncHandler(async (req, res) => {
     // res.send(account._id)
 });
 
+postsController.like_post = expressAsyncHandler(async (req, res) => {
+    const id = req.body.id;
+    if (id === undefined)
+        return setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
+    if (!isValidId(id)) {
+        return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
+    }
+
+    if (req.account.isBlocked) return setAndSendResponse(res, responseError.NOT_ACCESS);
+
+    try {
+        let post = await Post.findById(id);
+        if (post == null) {
+            return setAndSendResponse(res, responseError.POST_IS_NOT_EXISTED);
+        }
+
+        // bài viết bị khóa
+        if (post.banned) {
+            // console.log("bài viết bị khóa");
+            return setAndSendResponse(res, responseError.POST_IS_BANNED);
+        }
+
+        let author = await Account.findOne({_id: post.account_id}).exec();
+        if (author == null) setAndSendResponse(res, responseError.NO_DATA);
+        let user = req.account;
+
+        var isBlocked = false;
+        if (author?.blockedAccounts.length != 0)
+            isBlocked =
+                author?.blockedAccounts.findIndex((element) => {
+                    return element.account.toString() === user._id.toString();
+                }) !== -1;
+        if (!isBlocked) {
+            if (user?.blockedAccounts.length != 0)
+                isBlocked =
+                    user?.blockedAccounts?.findIndex((element) => {
+                        return element.account.toString() === author._id.toString();
+                    }) !== -1;
+        }
+        if (isBlocked) return callRes(res, responseError.NOT_ACCESS, 'Người viết đã chặn bạn / Bạn chặn người viết, do đó không thể like bài viết');
+
+        if (
+            post?.likedAccounts.findIndex((element) => {
+                return element.equals(user._id);
+            }) != -1
+        )
+            return setAndSendResponse(res, responseError.HAS_BEEN_LIKED);
+        else {
+            await Post.findOneAndUpdate(
+                {_id: id},
+                {$push: {likedAccounts: {_id: user._id}}}
+            );
+            var updatedPost = await Post.findOneAndUpdate({_id: id}, {$inc: {likes: 1}}, { new: true });
+            res.status(responseError.OK.statusCode).json({
+                code: responseError.OK.body.code,
+                message: responseError.OK.body.message,
+                data: {
+                    likes: updatedPost.likes
+                }
+            });
+        }
+    } catch (err) {
+        return setAndSendResponse(res, responseError.UNKNOWN_ERROR);
+    }
+});
+
+postsController.unlike_post = expressAsyncHandler(async (req, res) => {
+    const id = req.body.id;
+    if (id === undefined)
+        return setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
+    if (!isValidId(id)) {
+        return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
+    }
+
+    if (req.account.isBlocked) return setAndSendResponse(res, responseError.NOT_ACCESS);
+
+    try {
+        let post = await Post.findById(id);
+        if (post == null) {
+            return setAndSendResponse(res, responseError.POST_IS_NOT_EXISTED);
+        }
+
+        // bài viết bị khóa
+        if (post.banned) {
+            // console.log("bài viết bị khóa");
+            return setAndSendResponse(res, responseError.POST_IS_BANNED);
+        }
+
+        let author = await Account.findOne({_id: post.account_id}).exec();
+        if (author == null) setAndSendResponse(res, responseError.NO_DATA);
+        let user = req.account;
+
+        if (
+            post?.likedAccounts.findIndex((element) => {
+                return element.equals(user._id);
+            }) == -1
+        )
+            return setAndSendResponse(res, responseError.HAS_NOT_BEEN_LIKED);
+        else {
+            await Post.findOneAndUpdate(
+                {_id: id},
+                {$pull: {likedAccounts: user._id}}
+            );
+            var updatedPost = await Post.findOneAndUpdate({_id: id}, {$inc: {likes: -1}}, { new: true });
+            res.status(responseError.OK.statusCode).json({
+                code: responseError.OK.body.code,
+                message: responseError.OK.body.message,
+                data: {
+                    likes: updatedPost.likes
+                }
+            });
+        }
+    } catch (err) {
+        return setAndSendResponse(res, responseError.UNKNOWN_ERROR);
+    }
+});
+
 module.exports = postsController;
+

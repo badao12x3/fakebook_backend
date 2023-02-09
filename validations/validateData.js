@@ -60,7 +60,12 @@ function checkLink (link) {
     let result = banLink.filter(e => link.includes(e));
     if (result.length > 0) return false;
     else return true;
-  }
+}
+
+function isGender(gender) {
+    return ["Male", "Female", "Secret"].includes(gender);
+}
+
 module.exports = {
     isValidName,
     isValidPassword,
@@ -68,5 +73,9 @@ module.exports = {
     isValidId,
     isNumber,
     isValidCoordinates,
-    checkLink
+    checkLink,
+    isGender
 }
+
+
+
