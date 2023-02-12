@@ -64,7 +64,9 @@ accountsController.signup = expressAsyncHandler(async (req, res) => {
 });
 
 accountsController.del_request_friend = expressAsyncHandler(async (req, res) => {
-    const {sent_id, received_id} = req.body;
+    const {sent_id} = req.body;
+    const received_id = req.account._id;
+
     if (!sent_id || !received_id) return setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
 
     if (!isValidId(sent_id) || !isValidId(received_id) || sent_id === received_id) return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
@@ -164,8 +166,10 @@ accountsController.del_request_friend = expressAsyncHandler(async (req, res) => 
     return setAndSendResponse(res, responseError.DEL_REQUEST_FRIEND_FAILED);
 });
 
-accountsController.set_accept_friend = expressAsyncHandler(async (req, res) => {
-    const {sent_id, received_id} = req.body;
+accountsController.set_accept_friend = expressAsyncHandler(async (req, res) => {    
+    const {sent_id} = req.body;
+    const received_id = req.account._id;
+
     if (!sent_id || !received_id) return setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
 
     if (!isValidId(sent_id) || !isValidId(received_id) || sent_id === received_id) return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
@@ -274,10 +278,10 @@ accountsController.set_accept_friend = expressAsyncHandler(async (req, res) => {
 });
 
 accountsController.set_request_friend = expressAsyncHandler(async (req, res) => {
-    const {sent_id, received_id} = req.body;
+    const {sent_id} = req.body;
+    const received_id = req.account._id;
     if (!sent_id || !received_id) return setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
-
-    if (!isValidId(sent_id) || !isValidId(received_id) || sent_id === received_id) return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
+    if (!isValidId(sent_id)  || sent_id === received_id) return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
 
     let account = await Account.findOne({_id: sent_id}).select(["friends", "friendRequestReceived", "friendRequestSent", "blockedAccounts",]);
     let account_sent = await Account.findOne({_id: received_id});
@@ -347,7 +351,7 @@ accountsController.set_request_friend = expressAsyncHandler(async (req, res) => 
 });
 
 accountsController.get_requested_friends = expressAsyncHandler(async (req, res) => {
-    const {_id} = req.query;
+    const _id = req.account._id;
     if (!_id) {
         return setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
     } else if (!isValidId(_id)) {
