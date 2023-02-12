@@ -354,12 +354,25 @@ accountsController.get_requested_friends = expressAsyncHandler(async (req, res) 
         return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
     }
 
-    let account = await Account.findOne({_id: _id}).select("friendRequestReceived");
+    let account = await Account.findOne({_id: _id}).select("friendRequestReceived -_id" );
 
-    if (account == null) {
+    let friendRequestReceived = []
+
+    for (let friend of account["friendRequestReceived"]){
+      let account_id = friend["fromUser"]
+      let _account = await Account.findOne({_id: account_id}).select(["name", "avatar"]);
+      friendRequestReceived.push({
+        fromUser: account_id,
+        name: _account["name"],
+        avatar: _account["avatar"].url,
+        createdAt: friend["createdAt"]
+      })
+    }
+
+    if (friendRequestReceived == null) {
         return setAndSendResponse(res, responseError.NO_DATA);
     } else {
-        return res.status(responseError.OK.statusCode).json({account});
+        return res.status(responseError.OK.statusCode).json({friendRequestReceived});
     }
 });
 
