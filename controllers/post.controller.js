@@ -447,25 +447,15 @@ postsController.add_post = expressAsyncHandler(async (req, res) => {
 postsController.delete_post = expressAsyncHandler(async (req, res) => {
     const id = req.params.id;
 
-    // console.log(id);
-
-    // PARAMETER_IS_NOT_ENOUGH
-    if (id !== 0 && !id) {
-        // console.log("No have parameter id");
-        return setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
-    }
-
-    // PARAMETER_TYPE_IS_INVALID
-    if (id && !isValidId(id)) {
-        // console.log("PARAMETER_TYPE_IS_INVALID");
-        return setAndSendResponse(res, responseError.PARAMETER_TYPE_IS_INVALID);
+    if (id === undefined) return setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
+    if (!isValidId(id)) {
+        return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
     }
 
     // người dùng bị khóa tài khoản
     if (req.account.isBlocked) return setAndSendResponse(res, responseError.NOT_ACCESS);
 
     let post;
-
     try {
         post = await Post.findById(id);
     } catch (err) {
