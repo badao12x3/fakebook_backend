@@ -54,9 +54,12 @@ commentController.get_comment = expressAsyncHandler(async (req, res) => {
 
     if (commentList.length === 0) setAndSendResponse(res, responseError.NO_DATA);
 
-    res.json({
-        code: responseError.OK.statusCode, message: responseError.OK.body, data: commentsToData(commentList)
+    res.status(responseError.OK.statusCode).json({
+        code: responseError.OK.body.code,
+        message: responseError.OK.body.message,
+        data: commentsToData(commentList)
     });
+
 });
 
 commentController.set_comment = expressAsyncHandler(async (req, res) => {
@@ -127,15 +130,19 @@ function commentsToData(commentList) {
     for (let cmt of commentList) {
         data.push(commentToData(cmt))
     }
-    return data;
+    return {
+        commentList: data
+    };
 }
 
 function commentToData(comment) {
     const commenter = comment.userComment_id;
     return {
-        id: comment._id, comment: comment.content, created: comment.createdAt.getTime().toString(), poster: {
-            id: commenter._id, name: commenter.name
-            // avatar: comment.getAvatar()
+        id: comment._id, comment: comment.content, created: comment.createdAt.getTime().toString(),
+        poster: {
+            id: commenter._id,
+            name: commenter.name,
+            avatar: commenter.getAvatar()
         }
     }
 }
