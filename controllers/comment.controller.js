@@ -9,45 +9,13 @@ const {isNumber, isValidId} = require("../validations/validateData");
 
 const commentController = {};
 
-// commentController.get_comment = expressAsyncHandler(async (req, res)=> {
-//     const {id} = req.query;
-//     const {account} = req;
-//     let {index, count} = req.query;
-
-//     if(!id || !count || index == undefined) return setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
-
-//     if(!isValidId(id)) return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
-
-//     if(!isNumber(index) || !isNumber(count)) return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
-
-//     index = parseInt(index);
-//     count = parseInt(count);
-
-//     if(index < 0 || count < 1) return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
-
-//     if(account.isBlocked) return setAndSendResponse(res, responseError.NOT_ACCESS);
-
-//     //load Post, block List
-//     const post = await Post.findById(id);
-
-//     res.send(req.params.id)
-// });
-
 commentController.get_comment = expressAsyncHandler(async (req, res) => {
     const {id} = req.body;
     const account = req.account;
-    let {index, count} = req.body;
 
     if (!id) setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
 
     if (!isValidId(id)) setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
-
-    // if(!isNumber(index) || !isNumber(count)) setAndSendResponse(res, responseError.PARAMETER_TYPE_IS_INVALID);
-
-    index = parseInt(index);
-    count = parseInt(count);
-
-    if (index < 0 || count < 1) setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
 
     //Check User account is banned or not
     if (account.isBlocked) setAndSendResponse(res, responseError.NOT_ACCESS);
@@ -81,9 +49,7 @@ commentController.get_comment = expressAsyncHandler(async (req, res) => {
     //Get and check all comments
     const commentList = await Comment.find({
         post_id: id, userComment_id: {$nin: blockingList}
-    }).skip(index)
-        .limit(count)
-        .populate({path: 'userComment_id', model: Account})
+    })  .populate({path: 'userComment_id', model: Account})
         .sort("-createdAt");
 
     if (commentList.length === 0) setAndSendResponse(res, responseError.NO_DATA);
@@ -95,15 +61,9 @@ commentController.get_comment = expressAsyncHandler(async (req, res) => {
 
 commentController.set_comment = expressAsyncHandler(async (req, res) => {
     const {id, comment} = req.body;
-    let {index, count} = req.body;
     const account = req.account;
 
-    if (index === undefined || !count || !id || !comment) return setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
-
-    index = parseInt(index);
-    count = parseInt(count);
-
-    if (!isNumber(index) || !isNumber(count) || index < 0 || count < 1) return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
+    if (!id || !comment) return setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
 
     //Check Account isBlock ?
     if (account.isBlocked) return setAndSendResponse(res, responseError.NOT_ACCESS);
@@ -144,9 +104,7 @@ commentController.set_comment = expressAsyncHandler(async (req, res) => {
         //Get all comments
         const commentList = await Comment.find({
             post_id: id, userComment_id: {$nin: blockingList}
-        }).skip(index)
-            .limit(count)
-            .sort("-createdAt");
+        })  .sort("-createdAt");
 
         //Get all commenters
         let cmterIds = commentList.map(cmt => cmt.userComment_id);
