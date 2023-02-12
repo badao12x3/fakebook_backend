@@ -300,16 +300,9 @@ postsController.add_post = expressAsyncHandler(async (req, res) => {
         image = req.files.image;
         video = req.files.video
     }
-    // //thiếu param
-    // if(!described || !status) {
-    //     console.log("thiếu described hoặc status");
-    //     return setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
-    // }
 
-
-    //không có nội dung, ảnh và video
-    if (!described && !image && !video) {
-        // console.log("không có nội dung, ảnh và video, hãy thêm ít nhất 1 trong 3 trường");
+    // bắt buộc có nội dung, up mỗi ảnh không được
+    if (!described) {
         return setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
     }
 
@@ -404,16 +397,46 @@ postsController.add_post = expressAsyncHandler(async (req, res) => {
     post.described = described;
     post.status = status;
 
-
     try {
         const savedPost = await post.save();
-        return res.status(201).send({
+        let postResult = await Post.findById(savedPost._id).populate({path: 'likedAccounts', model: Account, select: ['_id', 'name', 'avatar.url', 'avatar.publicId']});
+
+        let result = {
+            id: postResult._id,
+            described: postResult.described,
+            createdAt: postResult.createdAt,
+            updatedAt: postResult.updatedAt,
+            likedAccounts: [],
+            likes: 0,
+            comments: 0,
+            author: {
+                id: req.account._id,
+                name: req.account.name,
+                avatar: req.account.getAvatar()
+            },
+            is_liked: false,
+            status: postResult.status,
+            is_blocked: true,
+            can_edit: true,
+            banned: true,
+            can_comment: true
+        };
+        if (postResult.images.length !== 0) {
+            result.images = postResult.images.map((image) => {
+                let {url, publicId} = image;
+                return {url: url, publicId: publicId};
+            });
+        }
+        if (postResult.video && postResult.video.url != undefined) {
+            result.video = {
+                url: postResult.video.url,
+                publicId: postResult.getVideoThumb()
+            }
+        }
+        res.status(201).json({
             code: responseError.OK.body.code,
             message: responseError.OK.body.message,
-            data: {
-                id: savedPost._id,
-                url: null
-            }
+            data: result
         });
     } catch (err) {
         // console.log("CAN_NOT_CONNECT_TO_DB");
