@@ -10,7 +10,7 @@ const {isNumber, isValidId} = require("../validations/validateData");
 const commentController = {};
 
 commentController.get_comment = expressAsyncHandler(async (req, res) => {
-    const {id} = req.body;
+    const {id} = req.query;
     const account = req.account;
 
     if (!id) setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
