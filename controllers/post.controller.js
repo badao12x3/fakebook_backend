@@ -399,6 +399,8 @@ postsController.delete_post = expressAsyncHandler(async (req, res) => {
     }
 });
 
+
+
 postsController.edit_post = expressAsyncHandler(async (req, res) => {
     var {id, status, image_del, described} = req.body;
     var image, video;
