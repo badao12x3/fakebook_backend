@@ -52,8 +52,6 @@ commentController.get_comment = expressAsyncHandler(async (req, res) => {
     })  .populate({path: 'userComment_id', model: Account})
         .sort("-createdAt");
 
-    if (commentList.length === 0) setAndSendResponse(res, responseError.NO_DATA);
-
     res.status(responseError.OK.statusCode).json({
         code: responseError.OK.body.code,
         message: responseError.OK.body.message,
@@ -138,7 +136,7 @@ function commentsToData(commentList) {
 function commentToData(comment) {
     const commenter = comment.userComment_id;
     return {
-        id: comment._id, comment: comment.content, created: comment.createdAt.getTime().toString(),
+        id: comment._id, comment: comment.content, createdAt: comment.createdAt,
         poster: {
             id: commenter._id,
             name: commenter.name,
