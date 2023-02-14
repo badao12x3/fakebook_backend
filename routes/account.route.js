@@ -18,6 +18,11 @@ accountRouter.get(
     accountsController.get_requested_friends
 );
 
+accountRouter.get(
+    "/get_list_friends", auth,
+    accountsController.get_list_friends
+);
+
 accountRouter.get('/get_user_info', auth, accountsController.get_user_info);
 accountRouter.post('/set_user_info', uploadAvatarOrCoverImageMiddleware, auth, accountsController.set_user_info);
 
