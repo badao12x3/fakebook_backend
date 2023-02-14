@@ -95,6 +95,21 @@ commentController.set_comment = expressAsyncHandler(async (req, res) => {
             post_id: id, userComment_id: account._id, content: comment
         }).save();
 
+        //Update comments in postmodel
+        const comments = await Comment.find({post_id: id});
+        const commentCount = comments.length;
+        const updatePost = await Post.findByIdAndUpdate(id, {
+            $set: {
+                comments: commentCount,
+                commentList: comments.map(comment => comment._id)
+            }
+        }, {
+            new: true
+        });
+
+        //Update commentList in postmodel
+
+
         //Get user blockList
         const blockingList = [];
         for (let value of account.blockedAccounts) {
