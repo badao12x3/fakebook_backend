@@ -621,15 +621,25 @@ accountsController.get_block_account = expressAsyncHandler(async (req, res) => {
         return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
     }
 
-    let account = await Account.findOne({_id: _id}).select("blockedAccounts");
+    let account = await Account.findOne({_id: _id});
 
     if (account == null) {
-        return setAndSendResponse(res, responseError.NO_DATA);
-    } else {
-        return res
-            .status(responseError.OK.statusCode)
-            .json({blockedAccounts: account?.blockedAccounts});
+      return setAndSendResponse(res, responseError.NO_DATA);
+  } else {
+    let data = [];
+    for (let item of account.blockedAccounts) {
+      const acc = await Account.findById({ _id: item.account });
+      data.push({
+        user: {
+          id: item.account,
+          name: acc.name,
+          avatar: acc.avatar.url,
+        },
+        createdAt: item.createdAt,
+      });
     }
+    return callRes(res, responseError.OK, { blockedAccounts: data });
+  }
 });
 
 accountsController.change_password = expressAsyncHandler(async (req, res) => {
