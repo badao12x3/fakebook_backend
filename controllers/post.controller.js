@@ -35,6 +35,7 @@ const statusArray = ['hạnh phúc', 'có phúc', 'được yêu', 'buồn', 'đ
     'bị tổn thương', 'khủng khiếp'
 ];
 
+const subjectArray = ['Ảnh khỏa thân', 'Bạo lực', 'Quấy rồi', 'Tự tử hoặc tự gây thương tích', 'Thông tin sai sự thật', 'Spam', 'Bán hàng trái phép', 'Ngôn từ gây thù ghét', 'Khủng bố'];
 
 function countWord(str) {
     return str.split(" ").length;
@@ -416,10 +417,10 @@ postsController.add_post = expressAsyncHandler(async (req, res) => {
             },
             is_liked: false,
             status: postResult.status,
-            is_blocked: true,
+            is_blocked: false,
             can_edit: true,
-            banned: true,
-            can_comment: true
+            banned: postResult.banned,
+            can_comment: postResult.canComment
         };
         if (postResult.images.length !== 0) {
             result.images = postResult.images.map((image) => {
@@ -504,6 +505,8 @@ postsController.delete_post = expressAsyncHandler(async (req, res) => {
         setAndSendResponse(res, responseError.CAN_NOT_CONNECT_TO_DB);
     }
 });
+
+
 
 postsController.edit_post = expressAsyncHandler(async (req, res) => {
     var {id, status, image_del, described} = req.body;
@@ -760,6 +763,11 @@ postsController.report_post = expressAsyncHandler(async (req, res) => {
 
     if (!isValidId(id)) setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
 
+    if (subject && !subjectArray.includes(subject)) {
+        // console.log("subject ko nằm trong dãy các subject mặc định");
+        return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID)
+    }
+
     //Check user being blocked or not
     if (account.isBlocked) setAndSendResponse(res, responseError.NOT_ACCESS);
 
@@ -781,7 +789,7 @@ postsController.report_post = expressAsyncHandler(async (req, res) => {
         post_id: id,
         subject: subject,
         details: details
-    })
+    }).save();
 
     setAndSendResponse(res, responseError.OK);
     // res.send(account._id)

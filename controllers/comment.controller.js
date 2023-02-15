@@ -10,7 +10,7 @@ const {isNumber, isValidId} = require("../validations/validateData");
 const commentController = {};
 
 commentController.get_comment = expressAsyncHandler(async (req, res) => {
-    const {id} = req.body;
+    const {id} = req.query;
     const account = req.account;
 
     if (!id) setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
@@ -51,8 +51,6 @@ commentController.get_comment = expressAsyncHandler(async (req, res) => {
         post_id: id, userComment_id: {$nin: blockingList}
     })  .populate({path: 'userComment_id', model: Account})
         .sort("-createdAt");
-
-    if (commentList.length === 0) setAndSendResponse(res, responseError.NO_DATA);
 
     res.status(responseError.OK.statusCode).json({
         code: responseError.OK.body.code,
@@ -98,6 +96,21 @@ commentController.set_comment = expressAsyncHandler(async (req, res) => {
             post_id: id, userComment_id: account._id, content: comment
         }).save();
 
+        //Update comments in postmodel
+        const comments = await Comment.find({post_id: id});
+        const commentCount = comments.length;
+        const updatePost = await Post.findByIdAndUpdate(id, {
+            $set: {
+                comments: commentCount,
+                commentList: comments.map(comment => comment._id)
+            }
+        }, {
+            new: true
+        });
+
+        //Update commentList in postmodel
+
+
         //Get user blockList
         const blockingList = [];
         for (let value of account.blockedAccounts) {
@@ -114,11 +127,13 @@ commentController.set_comment = expressAsyncHandler(async (req, res) => {
 
         let cmters = await Account.find({_id: {$in: cmterIds}});
 
-        res.json({
-            code: responseError.OK.statusCode, message: responseError.OK.body, data: commentMapper(commentList, cmters)
-        })
+        res.status(responseError.OK.statusCode).json({
+            code: responseError.OK.body.code,
+            message: responseError.OK.body.message,
+            data: commentMapper(commentList, cmters)
+        });
+
     } catch (error) {
-        console.log(error);
         setAndSendResponse(res, responseError.UNKNOWN_ERROR);
     }
 });
@@ -138,7 +153,7 @@ function commentsToData(commentList) {
 function commentToData(comment) {
     const commenter = comment.userComment_id;
     return {
-        id: comment._id, comment: comment.content, created: comment.createdAt.getTime().toString(),
+        id: comment._id, comment: comment.content, createdAt: comment.createdAt,
         poster: {
             id: commenter._id,
             name: commenter.name,
@@ -148,13 +163,17 @@ function commentToData(comment) {
 }
 
 function commentMapper(cmts, cmters) {
-    return cmts.map(cmt => {
+    let commentListData = cmts.map(cmt => {
         let cmter = cmters.find(cmter => cmter._id.equals(cmt.userComment_id));
 
         return {
-            id: cmt._id, comment: cmt.content, createdAt: cmt.createdAt.getTime().toString(), poster: {
-                id: cmter._id, name: cmter.name, // avatar: cmter.getAvatar()
+            id: cmt._id, comment: cmt.content, createdAt: cmt.createdAt,
+            poster: {
+                id: cmter._id,
+                name: cmter.name,
+                avatar: cmter.getAvatar()
             }
         }
     });
+    return { commentList: commentListData };
 }
