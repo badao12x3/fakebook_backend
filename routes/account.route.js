@@ -26,7 +26,7 @@ accountRouter.get(
 accountRouter.get('/get_user_info', auth, accountsController.get_user_info);
 accountRouter.post('/set_user_info', uploadAvatarOrCoverImageMiddleware, auth, accountsController.set_user_info);
 
-accountRouter.post(
+accountRouter.get(
     "/get_blocked_account",
     auth,
     accountsController.get_block_account
