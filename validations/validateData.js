@@ -1,9 +1,8 @@
 function isValidName(username){
     // https://stackoverflow.com/questions/12018245/regular-expression-to-validate-username
-    const regName1 =  /^[a-zA-Z]+( [a-zA-Z]+)+$/;
-    const regName2 =  /^[a-zA-Z]+$/;
+    var regexp = /^((?![0-9\~\!\@\#\$\%\^\&\*\(\)\_\+\=\-\[\]\{\}\;\:\"\\\/\<\>\?]).)+$/;
 
-    return regName1.test(username)||regName2.test(username);
+    return regexp.test(username);
 }
 
 function isValidPassword(password){
