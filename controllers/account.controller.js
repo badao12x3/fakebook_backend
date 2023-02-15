@@ -382,6 +382,96 @@ accountsController.get_requested_friends = expressAsyncHandler(async (req, res) 
 });
 
 
+accountsController.del_friend = expressAsyncHandler(async (req, res) => {
+    const {sent_id} = req.body;
+    const received_id = req.account.id;
+
+    if (!sent_id || !received_id) return setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
+
+    if (!isValidId(sent_id) || !isValidId(received_id) || sent_id === received_id) return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
+
+    let list_of_sender = await Account.findOne({_id: sent_id}).select(["friends",]);
+    
+    let list_of_receiver = await Account.findOne({_id: received_id}).select(["friends"]);
+
+    if (list_of_sender == null || list_of_receiver == null) {
+        return setAndSendResponse(res, responseError.NO_DATA);
+    }
+
+    let list_friend_of_sender = list_of_sender["friends"];
+
+    let list_friend_of_receiver = list_of_receiver["friends"];
+
+    let check1 = false, check2 = false;
+
+    for (let i of list_friend_of_sender) {
+        if (i["friend"] == received_id) {
+            check1 = true;
+            break;
+        }
+    }
+
+    for (let i of list_friend_of_receiver) {
+        if (i["friend"] == sent_id) {
+            check2 = true;
+            break;
+        }
+    }
+
+    if (check1 && check2) {
+        var new_list_friend_of_sender = [];
+        for (let i of list_friend_of_sender) {
+            if (i["friend"] != received_id) {
+                new_list_friend_of_sender.push(i);
+            }
+        }
+
+        const filter_sent = {
+            _id: sent_id
+        }
+
+        const update_sent = {
+            $set: {
+                friends: new_list_friend_of_sender
+            }
+        }
+
+        await Account.updateOne(filter_sent, update_sent);
+
+        var new_list_friend_of_receiver = [];
+
+        for (let i of list_friend_of_receiver) {
+            if (i["friend"] != sent_id) {
+                new_list_friend_of_receiver.push(i);
+            }
+        }
+
+        const filter_received = {
+            _id: received_id
+        }
+
+        const update_received = {
+            $set: {
+                friends: new_list_friend_of_receiver
+            }
+        }
+
+        await Account.updateOne(filter_received, update_received);
+
+        return setAndSendResponse(res, responseError.OK);
+    }
+
+    return setAndSendResponse(res, {
+      statusCode: 400,
+      body: {
+        code: "503",
+        message: "Failed to delete friend",
+      },
+    });
+});
+
+
+
 accountsController.get_list_friends = expressAsyncHandler(async (req, res) => {
     const {user_id} = req.query;
     const _id = user_id?user_id:req.account._id;

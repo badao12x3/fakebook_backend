@@ -18,6 +18,10 @@ accountRouter.get(
     accountsController.get_requested_friends
 );
 
+accountRouter.post(
+    "/del_friend", auth,
+    accountsController.del_friend
+);
 accountRouter.get(
     "/get_list_friends", auth,
     accountsController.get_list_friends
