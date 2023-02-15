@@ -23,8 +23,14 @@ accountRouter.post(
     accountsController.del_friend
 );
 accountRouter.get(
-    "/get_list_friends", auth,
-    accountsController.get_list_friends
+  "/get_list_unknown_people",
+  auth,
+  accountsController.get_list_unknown_people
+);
+accountRouter.get(
+  "/get_list_friends",
+  auth,
+  accountsController.get_list_friends
 );
 
 accountRouter.get('/get_user_info', auth, accountsController.get_user_info);
