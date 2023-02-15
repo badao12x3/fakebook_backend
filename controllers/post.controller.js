@@ -417,10 +417,10 @@ postsController.add_post = expressAsyncHandler(async (req, res) => {
             },
             is_liked: false,
             status: postResult.status,
-            is_blocked: true,
+            is_blocked: false,
             can_edit: true,
-            banned: true,
-            can_comment: true
+            banned: postResult.banned,
+            can_comment: postResult.canComment
         };
         if (postResult.images.length !== 0) {
             result.images = postResult.images.map((image) => {
