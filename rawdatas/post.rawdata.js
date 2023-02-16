@@ -8,9 +8,12 @@ const posts = [
             "63bbff18fc13ae6493000830",
             "63bbff18fc13ae649300082f",
         ],
-        commentList: [],
+        commentList: [
+            "63dda804622f8f4918646da1",
+            "63dda804622f8f4918646da2"
+        ],
         likes: 6,
-        comments: 0,
+        comments: 2,
         canComment: false,
         banned: false,
         reports_post: [],
@@ -51,9 +54,9 @@ const posts = [
     },
     {
         likedAccounts: ["63bbff18fc13ae649300082f"],
-        commentList: [],
+        commentList: ["63dda804622f8f4918646da3"],
         likes: 1,
-        comments: 0,
+        comments: 1,
         canComment: false,
         banned: false,
         reports_post: [],
@@ -103,9 +106,15 @@ const posts = [
             "63bbff18fc13ae6493000830",
             "63bbff18fc13ae649300082f",
         ],
-        commentList: ["63bbff18fc13ae6493000833", "63bbff18fc13ae6493000832"],
+        commentList: [
+            "63dda804622f8f4918646da4",
+            "63dda804622f8f4918646da5",
+            "63dda804622f8f4918646da6",
+            "63ddd63b4f83c220d840ac60",
+            "63ddd63b4f83c220d840ac61"
+        ],
         likes: 9,
-        comments: 2,
+        comments: 5,
         canComment: true,
         banned: false,
         reports_post: [],
@@ -171,9 +180,9 @@ const posts = [
     },
     {
         likedAccounts: ["63bbff18fc13ae649300082d"],
-        commentList: ["63bbff18fc13ae649300082a"],
+        commentList: [],
         likes: 1,
-        comments: 1,
+        comments: 0,
         canComment: true,
         banned: true,
         reports_post: [],
@@ -219,9 +228,9 @@ const posts = [
             "63bbff18fc13ae6493000833",
             "63bbff18fc13ae649300082b",
         ],
-        commentList: ["63bbff18fc13ae649300082b", "63bbff18fc13ae6493000831"],
+        commentList: [],
         likes: 5,
-        comments: 2,
+        comments: 0,
         canComment: true,
         banned: false,
         reports_post: [],
@@ -242,9 +251,12 @@ const posts = [
             "63bbff18fc13ae6493000833",
             "63bbff18fc13ae6493000831",
         ],
-        commentList: [],
+        commentList: [
+            "63dda804622f8f4918646da7",
+            "63dda804622f8f4918646da8"
+        ],
         likes: 5,
-        comments: 0,
+        comments: 2,
         canComment: false,
         banned: true,
         reports_post: [],
@@ -264,9 +276,15 @@ const posts = [
             "63bbff18fc13ae649300082e",
             "63bbff18fc13ae649300082d",
         ],
-        commentList: [],
+        commentList: [
+            "63dda804622f8f4918646da9",
+            "63dda804622f8f4918646daa",
+            "63dda804622f8f4918646dab",
+            "63dda804622f8f4918646dac",
+            "63dda804622f8f4918646dad",
+        ],
         likes: 4,
-        comments: 0,
+        comments: 5,
         canComment: false,
         banned: true,
         reports_post: [],
@@ -301,9 +319,15 @@ const posts = [
     },
     {
         likedAccounts: [],
-        commentList: [],
+        commentList: [
+            "63dda804622f8f4918646dae",
+            "63dda804622f8f4918646daf",
+            "63ddd63b4f83c220d840ac62",
+            "63ddd63b4f83c220d840ac63",
+            "63ddd63b4f83c220d840ac64"
+        ],
         likes: 0,
-        comments: 0,
+        comments: 5,
         canComment: false,
         banned: false,
         reports_post: [],
@@ -321,8 +345,8 @@ const posts = [
 const comments = [
     {
         _id: "63dda804622f8f4918646da1",
-        post_id: "63a6cfac5727cc1540bd2eca",
-        userComment_id: "63a6854c92f5e81f48ae4e52",
+        post_id: "63ddd33e5fa9cf5634bb2806",
+        userComment_id: "63bbff18fc13ae6493000833",
         content:
             "In blandit ultrices enim. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.",
         __v: 0,
@@ -331,8 +355,8 @@ const comments = [
     },
     {
         _id: "63dda804622f8f4918646da2",
-        post_id: "63a6cfac5727cc1540bd2ec6",
-        userComment_id: "63a6854c92f5e81f48ae4e53",
+        post_id: "63ddd33e5fa9cf5634bb2806",
+        userComment_id: "63bbff18fc13ae649300082b",
         content: "Curabitur at ipsum ac tellus semper interdum.",
         __v: 0,
         createdAt: "2023-02-04T00:34:12.802Z",
@@ -340,8 +364,8 @@ const comments = [
     },
     {
         _id: "63dda804622f8f4918646da3",
-        post_id: "63a6cfac5727cc1540bd2ed2",
-        userComment_id: "63a6854c92f5e81f48ae4e53",
+        post_id: "63ddd33e5fa9cf5634bb280c",
+        userComment_id: "63bbff18fc13ae649300082b",
         content:
             "Donec odio justo, sollicitudin ut, suscipit a, feugiat et, eros. Vestibulum ac est lacinia nisi venenatis tristique. Fusce congue, diam id ornare imperdiet, sapien urna pretium nisl, ut volutpat sapien arcu sed augue.",
         __v: 0,
@@ -350,8 +374,8 @@ const comments = [
     },
     {
         _id: "63dda804622f8f4918646da4",
-        post_id: "63a6cfac5727cc1540bd2eca",
-        userComment_id: "63a6854c92f5e81f48ae4e53",
+        post_id: "63ddd33e5fa9cf5634bb280e",
+        userComment_id: "63bbff18fc13ae6493000831",
         content:
             "Fusce congue, diam id ornare imperdiet, sapien urna pretium nisl, ut volutpat sapien arcu sed augue.",
         __v: 0,
@@ -360,8 +384,8 @@ const comments = [
     },
     {
         _id: "63dda804622f8f4918646da5",
-        post_id: "63a6cfac5727cc1540bd2ece",
-        userComment_id: "63a6854c92f5e81f48ae4e51",
+        post_id: "63ddd33e5fa9cf5634bb280e",
+        userComment_id: "63bbff18fc13ae6493000831",
         content:
             "Fusce congue, diam id ornare imperdiet, sapien urna pretium nisl, ut volutpat sapien arcu sed augue. Aliquam erat volutpat. In congue.",
         __v: 0,
@@ -370,8 +394,8 @@ const comments = [
     },
     {
         _id: "63dda804622f8f4918646da6",
-        post_id: "63a6cfac5727cc1540bd2ece",
-        userComment_id: "63a6854c92f5e81f48ae4e51",
+        post_id: "63ddd33e5fa9cf5634bb280e",
+        userComment_id: "63bbff18fc13ae649300082b",
         content: "Donec posuere metus vitae ipsum.",
         __v: 0,
         createdAt: "2023-02-04T00:34:12.802Z",
@@ -379,8 +403,8 @@ const comments = [
     },
     {
         _id: "63dda804622f8f4918646da7",
-        post_id: "63a6cfac5727cc1540bd2ed2",
-        userComment_id: "63a6854c92f5e81f48ae4e51",
+        post_id: "63ddd33e5fa9cf5634bb281b",
+        userComment_id: "63bbff18fc13ae649300082b",
         content:
             "Fusce posuere felis sed lacus. Morbi sem mauris, laoreet ut, rhoncus aliquet, pulvinar sed, nisl.",
         __v: 0,
@@ -389,8 +413,8 @@ const comments = [
     },
     {
         _id: "63dda804622f8f4918646da8",
-        post_id: "63a6cfac5727cc1540bd2eca",
-        userComment_id: "63a6854c92f5e81f48ae4e52",
+        post_id: "63ddd33e5fa9cf5634bb281b",
+        userComment_id: "63bbff18fc13ae649300082b",
         content:
             "Sed vel enim sit amet nunc viverra dapibus. Nulla suscipit ligula in lacus. Curabitur at ipsum ac tellus semper interdum.",
         __v: 0,
@@ -399,8 +423,8 @@ const comments = [
     },
     {
         _id: "63dda804622f8f4918646da9",
-        post_id: "63a6cfac5727cc1540bd2ed0",
-        userComment_id: "63a6854c92f5e81f48ae4e52",
+        post_id: "63ddd33e5fa9cf5634bb281c",
+        userComment_id: "63bbff18fc13ae649300082f",
         content: "Proin at turpis a pede posuere nonummy.",
         __v: 0,
         createdAt: "2023-02-04T00:34:12.803Z",
@@ -408,8 +432,8 @@ const comments = [
     },
     {
         _id: "63dda804622f8f4918646daa",
-        post_id: "63a6cfac5727cc1540bd2ec6",
-        userComment_id: "63a6854c92f5e81f48ae4e52",
+        post_id: "63ddd33e5fa9cf5634bb281c",
+        userComment_id: "63bbff18fc13ae649300082f",
         content: "Integer tincidunt ante vel ipsum. Praesent blandit lacinia erat.",
         __v: 0,
         createdAt: "2023-02-04T00:34:12.803Z",
@@ -417,8 +441,8 @@ const comments = [
     },
     {
         _id: "63dda804622f8f4918646dab",
-        post_id: "63a6cfac5727cc1540bd2ece",
-        userComment_id: "63a6854c92f5e81f48ae4e55",
+        post_id: "63ddd33e5fa9cf5634bb281c",
+        userComment_id: "63bbff18fc13ae649300082f",
         content:
             "Morbi vestibulum, velit id pretium iaculis, diam erat fermentum justo, nec condimentum neque sapien placerat ante. Nulla justo.",
         __v: 0,
@@ -427,8 +451,8 @@ const comments = [
     },
     {
         _id: "63dda804622f8f4918646dac",
-        post_id: "63a6cfac5727cc1540bd2ece",
-        userComment_id: "63a6854c92f5e81f48ae4e52",
+        post_id: "63ddd33e5fa9cf5634bb281c",
+        userComment_id: "63bbff18fc13ae6493000830",
         content:
             "Nullam sit amet turpis elementum ligula vehicula consequat. Morbi a ipsum.",
         __v: 0,
@@ -437,8 +461,8 @@ const comments = [
     },
     {
         _id: "63dda804622f8f4918646dad",
-        post_id: "63a6cfac5727cc1540bd2ece",
-        userComment_id: "63a6854c92f5e81f48ae4e55",
+        post_id: "63ddd33e5fa9cf5634bb281c",
+        userComment_id: "63bbff18fc13ae6493000830",
         content: "Nulla facilisi.",
         __v: 0,
         createdAt: "2023-02-04T00:34:12.803Z",
@@ -446,8 +470,8 @@ const comments = [
     },
     {
         _id: "63dda804622f8f4918646dae",
-        post_id: "63a6cfac5727cc1540bd2eca",
-        userComment_id: "63a6854c92f5e81f48ae4e51",
+        post_id: "63ddd33e5fa9cf5634bb2820",
+        userComment_id: "63bbff18fc13ae6493000830",
         content:
             "Quisque erat eros, viverra eget, congue eget, semper rutrum, nulla.",
         __v: 0,
@@ -456,8 +480,8 @@ const comments = [
     },
     {
         _id: "63dda804622f8f4918646daf",
-        post_id: "63a6cfac5727cc1540bd2ece",
-        userComment_id: "63a6854c92f5e81f48ae4e53",
+        post_id: "63ddd33e5fa9cf5634bb2820",
+        userComment_id: "63bbff18fc13ae649300082b",
         content: "Aliquam non mauris. Morbi non lectus.",
         __v: 0,
         createdAt: "2023-02-04T00:34:12.803Z",
@@ -466,7 +490,7 @@ const comments = [
     {
         _id: "63ddd63b4f83c220d840ac60",
         post_id: "63ddd33e5fa9cf5634bb280e",
-        userComment_id: "63bbff18fc13ae6493000833",
+        userComment_id: "63bbff18fc13ae649300082a",
         content:
             "The lazy bird humbly ran because some clock elegantly ran into a beautiful duck which, became a rough, lazy old lady.",
         __v: 0,
@@ -476,7 +500,7 @@ const comments = [
     {
         _id: "63ddd63b4f83c220d840ac61",
         post_id: "63ddd33e5fa9cf5634bb280e",
-        userComment_id: "63bbff18fc13ae6493000832",
+        userComment_id: "63bbff18fc13ae649300082f",
         content:
             "The vibrating dog precisely ran because some hamster calmly slept across a slimy professor which, became a professional, lazy duck.",
         __v: 0,
@@ -485,8 +509,8 @@ const comments = [
     },
     {
         _id: "63ddd63b4f83c220d840ac62",
-        post_id: "63ddd33e5fa9cf5634bb2816",
-        userComment_id: "63bbff18fc13ae649300082a",
+        post_id: "63ddd33e5fa9cf5634bb2820",
+        userComment_id: "63bbff18fc13ae6493000833",
         content:
             "The rough plastic sadly sliced because some teacher humbly rolled below a lovely hamster which, became a dumb, dumb plastic.",
         __v: 0,
@@ -495,8 +519,8 @@ const comments = [
     },
     {
         _id: "63ddd63b4f83c220d840ac63",
-        post_id: "63ddd33e5fa9cf5634bb281a",
-        userComment_id: "63bbff18fc13ae649300082b",
+        post_id: "63ddd33e5fa9cf5634bb2820",
+        userComment_id: "63bbff18fc13ae6493000830",
         content:
             "The dumb professor proudly slept because some duck sadly sliced upon a hot dog which, became a soft, vibrating clock.",
         __v: 0,
@@ -505,8 +529,8 @@ const comments = [
     },
     {
         _id: "63ddd63b4f83c220d840ac64",
-        post_id: "63ddd33e5fa9cf5634bb281a",
-        userComment_id: "63bbff18fc13ae6493000831",
+        post_id: "63ddd33e5fa9cf5634bb2820",
+        userComment_id: "63bbff18fc13ae6493000830",
         content:
             "The lovely duck precisely dodged because some plastic quickly dodged on a dumb old lady which, became a professional, lovely boy.",
         __v: 0,

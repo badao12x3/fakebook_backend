@@ -225,10 +225,6 @@ importDataRouter.get(
   expressAsyncHandler(async (req, res) => {
     const all = await Account.find({});
 
-    for (const [key, value] of Object.entries(all)) {
-      console.log(`${key}: ${value}`);
-    }
-
     res.send({ all });
   })
 );

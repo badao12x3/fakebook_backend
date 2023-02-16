@@ -10,7 +10,7 @@ const {isNumber, isValidId} = require("../validations/validateData");
 const commentController = {};
 
 commentController.get_comment = expressAsyncHandler(async (req, res) => {
-    const {id} = req.body;
+    const {id} = req.query;
     const account = req.account;
 
     if (!id) setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
@@ -52,11 +52,12 @@ commentController.get_comment = expressAsyncHandler(async (req, res) => {
     })  .populate({path: 'userComment_id', model: Account})
         .sort("-createdAt");
 
-    if (commentList.length === 0) setAndSendResponse(res, responseError.NO_DATA);
-
-    res.json({
-        code: responseError.OK.statusCode, message: responseError.OK.body, data: commentsToData(commentList)
+    res.status(responseError.OK.statusCode).json({
+        code: responseError.OK.body.code,
+        message: responseError.OK.body.message,
+        data: commentsToData(commentList)
     });
+
 });
 
 commentController.set_comment = expressAsyncHandler(async (req, res) => {
@@ -126,11 +127,13 @@ commentController.set_comment = expressAsyncHandler(async (req, res) => {
 
         let cmters = await Account.find({_id: {$in: cmterIds}});
 
-        res.json({
-            code: responseError.OK.statusCode, message: responseError.OK.body, data: commentMapper(commentList, cmters)
-        })
+        res.status(responseError.OK.statusCode).json({
+            code: responseError.OK.body.code,
+            message: responseError.OK.body.message,
+            data: commentMapper(commentList, cmters)
+        });
+
     } catch (error) {
-        console.log(error);
         setAndSendResponse(res, responseError.UNKNOWN_ERROR);
     }
 });
@@ -142,27 +145,35 @@ function commentsToData(commentList) {
     for (let cmt of commentList) {
         data.push(commentToData(cmt))
     }
-    return data;
+    return {
+        commentList: data
+    };
 }
 
 function commentToData(comment) {
     const commenter = comment.userComment_id;
     return {
-        id: comment._id, comment: comment.content, created: comment.createdAt.getTime().toString(), poster: {
-            id: commenter._id, name: commenter.name
-            // avatar: comment.getAvatar()
+        id: comment._id, comment: comment.content, createdAt: comment.createdAt,
+        poster: {
+            id: commenter._id,
+            name: commenter.name,
+            avatar: commenter.getAvatar()
         }
     }
 }
 
 function commentMapper(cmts, cmters) {
-    return cmts.map(cmt => {
+    let commentListData = cmts.map(cmt => {
         let cmter = cmters.find(cmter => cmter._id.equals(cmt.userComment_id));
 
         return {
-            id: cmt._id, comment: cmt.content, createdAt: cmt.createdAt.getTime().toString(), poster: {
-                id: cmter._id, name: cmter.name, // avatar: cmter.getAvatar()
+            id: cmt._id, comment: cmt.content, createdAt: cmt.createdAt,
+            poster: {
+                id: cmter._id,
+                name: cmter.name,
+                avatar: cmter.getAvatar()
             }
         }
     });
+    return { commentList: commentListData };
 }
