@@ -279,8 +279,8 @@ accountsController.set_accept_friend = expressAsyncHandler(async (req, res) => {
 });
 
 accountsController.set_request_friend = expressAsyncHandler(async (req, res) => {
-    const {sent_id} = req.body;
-    const received_id = req.account.id;
+    const {received_id} = req.body;
+    const sent_id = req.account.id;
     if (!sent_id || !received_id) return setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
     if (!isValidId(sent_id)  || sent_id === received_id) return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
 
@@ -347,7 +347,7 @@ accountsController.set_request_friend = expressAsyncHandler(async (req, res) => 
 
     await Account.updateOne(filter_send, update_send);
     await Account.updateOne(filter_received, update_received);
-
+    console.log("ok r nha")
     return setAndSendResponse(res, responseError.OK);
 });
 
@@ -470,6 +470,61 @@ accountsController.del_friend = expressAsyncHandler(async (req, res) => {
     });
 });
 
+accountsController.get_list_unknown_people = expressAsyncHandler(
+  async (req, res) => {
+    const _id = req.account._id;
+    if (!_id) {
+      return setAndSendResponse(res, responseError.PARAMETER_IS_NOT_ENOUGH);
+    } else if (!isValidId(_id)) {
+      return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
+    }
+    let account = await Account.findOne({ _id: _id }).select([
+      "friends",
+      "blockedAccounts",
+      "friendRequestReceived",
+      "friendRequestSent",
+    ]);
+    let ListPeople = [];
+    if (!account) {
+      return setAndSendResponse(res, responseError.NO_DATA);
+    } else {
+      account["friends"].filter((friend) => {
+        ListPeople.push(friend.friend);
+      });
+
+      account["blockedAccounts"].filter((friend) => {
+        ListPeople.push(friend.friend);
+      });
+
+      account["friendRequestReceived"].filter((friend) => {
+        ListPeople.push(friend.friend);
+      });
+
+      account["friendRequestSent"].filter((friend) => {
+        ListPeople.push(friend.friend);
+      });
+
+
+      let _ListUnknownPeople = await Account.find({
+        $and: [{ _id: { $ne: _id } }, { _id: { $nin: ListPeople } }],
+      }).select("_id");
+
+      ListUnknownPeople = [];
+      
+      for (let people of _ListUnknownPeople){
+        let account_id = people["_id"]
+        let _account = await Account.findOne({_id: account_id}).select(["name", "avatar"]);
+        ListUnknownPeople.push({
+          id: account_id,
+          name: _account["name"],
+          avatar: _account["avatar"].url
+        })
+      }
+
+      return res.status(responseError.OK.statusCode).json({ ListUnknownPeople });
+    }
+  }
+);
 
 
 accountsController.get_list_friends = expressAsyncHandler(async (req, res) => {

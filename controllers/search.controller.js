@@ -52,11 +52,52 @@ searchController.search_sth = expressAsyncHandler(async (req,res) => {
     const recentSearch = searches[0];
     const searchIdsToDelete = searches.slice(1).map(search => search._id);
 
-    await Search.deleteMany({ _id: { $in: searchIdsToDelete}})
-    res.json({
-        code: responseError.OK.statusCode, 
-        message: responseError.OK.body, 
-        data: postList
+    await Search.deleteMany({ _id: { $in: searchIdsToDelete}});
+
+    let result = {
+        posts: postList.map(post => {
+            const isBlocked = post.account_id.blockedAccounts.findIndex((element) => {
+                return element.account.toString() === req.account._id.toString()
+            }) !== -1;
+            let subResult = {
+                id: post._id,
+                described: post.described,
+                createdAt: post.createdAt,
+                updatedAt: post.updatedAt,
+                likes: post.likes,
+                comments: post.comments,
+                author: {
+                    id: post.account_id._id,
+                    name: post.account_id.name,
+                    avatar: post.account_id.getAvatar()
+                },
+                is_liked: post.likedAccounts.includes(req.account._id),
+                status: post.status,
+                is_blocked: isBlocked,
+                can_edit: req.account._id.equals(post.account_id._id) ? (post.banned ? false : true) : false,
+                banned: post.banned,
+                can_comment: post.canComment
+            };
+            if (post.images.length !== 0) {
+                subResult.images = post.images.map((image) => {
+                    let {url, publicId} = image;
+                    return {url: url, publicId: publicId};
+                });
+            }
+            if (post.video && post.video.url != undefined) {
+                subResult.video = {
+                    url: post.video.url,
+                    publicId: post.getVideoThumb()
+                }
+            }
+            return subResult;
+        }),
+    }
+
+    res.status(responseError.OK.statusCode).json({
+        code: responseError.OK.body.code,
+        message: responseError.OK.body.message,
+        data: result
     });
 });
 
@@ -74,11 +115,11 @@ searchController.get_saved_search = expressAsyncHandler(async (req,res) => {
         return setAndSendResponse(res, responseError.NO_DATA);
     }
 
-    res.json({
-        code: responseError.OK.statusCode,
-        message: responseError.OK.body,
+    res.status(responseError.OK.statusCode).json({
+        code: responseError.OK.body.code,
+        message: responseError.OK.body.message,
         data: searchList
-    })
+    });
 });
 
 searchController.del_saved_search = expressAsyncHandler(async (req,res) => {
