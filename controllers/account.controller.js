@@ -731,6 +731,75 @@ accountsController.get_block_account = expressAsyncHandler(async (req, res) => {
     return callRes(res, responseError.OK, { blockedAccounts: data });
   }
 });
+ 
+accountsController.block_by_id = expressAsyncHandler(async (req, res) => {
+    const {id} = req.body;
+    if(!id)  {
+        return callRes(res, responseError.PARAMETER_IS_NOT_ENOUGH);
+    }
+    if(!Account.findById(id)) {
+        return callRes(res. responseError.NO_DATA);
+    }
+    if(id == req?.account?._id){
+        
+        return callRes(res. responseError.NOT_ACCESS);
+    }
+    try {
+        user = await Account.findOne({_id: req.account._id});
+        if (
+            user.blockedAccounts.find(item =>{
+                return item.account.equals(id)
+            })
+        ){
+            return setAndSendResponse(res, responseError.HAS_BLOCK);
+        }
+        await Account.findOneAndUpdate({_id: req.account._id}, 
+            {$push: 
+                {blockedAccounts: 
+                    {account: id, createdAt: Date.now()}
+                }
+            }
+        );
+        return setAndSendResponse(res, responseError.OK);
+    } catch (err) {
+        return setAndSendResponse(res, responseError.CAN_NOT_CONNECT_TO_DB);
+    }
+
+})
+accountsController.remove_block_by_id = expressAsyncHandler(async (req, res) => {
+    const {id} = req.body;
+    if(!id)  {
+        return callRes(res, responseError.PARAMETER_IS_NOT_ENOUGH);
+    }
+    if(!Account.findById(id)) {
+        return callRes(res. responseError.NO_DATA);
+    }
+    if(id == req?.account?._id){
+        
+        return callRes(res. responseError.NOT_ACCESS);
+    }
+    try {
+        user = await Account.findOne({_id: req.account._id});
+        if (
+            !user.blockedAccounts.find(item =>{
+                return item.account.equals(id)
+            })
+        ){
+            return setAndSendResponse(res, responseError.HAS_NOT_BLOCK);
+        }
+        await Account.findOneAndUpdate({_id: req.account._id}, 
+            {$pull: 
+                {blockedAccounts: 
+                    {account: id,}
+                }
+            }
+        );
+        return setAndSendResponse(res, responseError.OK);
+    } catch (err) {
+        return setAndSendResponse(res, responseError.CAN_NOT_CONNECT_TO_DB);
+    }
+
+})
 
 accountsController.change_password = expressAsyncHandler(async (req, res) => {
     const {password, newPassword} = req.body;

@@ -174,7 +174,13 @@ const responseError = {
             message: "Blocked each other"
         }
     },
-
+    HAS_NOT_BLOCK :{
+        statusCode: 400,
+        body: {
+            code: "502",
+            message: "Has not blocked yet"
+        }
+    },
     DEL_REQUEST_FRIEND_FAILED: {
         statusCode: 400,
         body: {

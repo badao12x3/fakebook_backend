@@ -46,5 +46,8 @@ accountRouter.post(
     accountsController.change_info_after_signup
 );
 accountRouter.post("/logout", auth, accountsController.logout);
+accountRouter.post("/block_by_id",auth, accountsController.block_by_id)
+accountRouter.post("/remove_block_by_id",auth, accountsController.remove_block_by_id)
+
 
 module.exports = accountRouter;
