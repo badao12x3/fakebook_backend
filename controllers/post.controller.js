@@ -149,9 +149,13 @@ postsController.get_list_posts = expressAsyncHandler(async (req, res) => {
         }
 
         let result = {
-            posts: slicePosts.map(post => {
+            posts: slicePosts.map(post => { 
+                // console.log(post.account_id.blockedAccounts)
                 const isBlocked = post.account_id.blockedAccounts.findIndex((element) => {
                     return element.account.toString() === req.account._id.toString()
+                }) !== -1;
+                const isBlocked1 = req.account.blockedAccounts.findIndex((element) => {
+                    return element.account.toString() === post.account_id._id.toString()
                 }) !== -1;
                 let subResult = {
                     id: post._id,
@@ -167,7 +171,7 @@ postsController.get_list_posts = expressAsyncHandler(async (req, res) => {
                     },
                     is_liked: post.likedAccounts.includes(req.account._id),
                     status: post.status,
-                    is_blocked: isBlocked,
+                    is_blocked: isBlocked || isBlocked1,
                     can_edit: req.account._id.equals(post.account_id._id) ? (post.banned ? false : true) : false,
                     banned: post.banned,
                     can_comment: post.canComment
