@@ -167,7 +167,7 @@ postsController.get_list_posts = expressAsyncHandler(async (req, res) => {
                     author: {
                         id: post.account_id._id,
                         name: post.account_id.name,
-                        avatar: post.account_id.getAvatar()
+                        avatar: post.account_id.avatar.url
                     },
                     is_liked: post.likedAccounts.includes(req.account._id),
                     status: post.status,

@@ -55,7 +55,18 @@ accountsController.signup = expressAsyncHandler(async (req, res) => {
     if (!userExists) {
         // CHƯA HASH PASSWORD, làm sau
         await new Account({
-            phoneNumber: phoneNumber, password: password, // uuid: req.query.uuid
+            phoneNumber: phoneNumber, 
+            password: password, 
+            avatar: {
+                publicId: null,
+                url: "https://pwco.com.sg/wp-content/uploads/2020/05/Generic-Profile-Placeholder-v3-1024x1024.png",
+                filename: null
+            }, 
+            coverImage: {
+                publicId: null,
+                url: "https://wtwp.com/wp-content/uploads/2015/06/placeholder-image.png",
+                filename: null
+            }  // uuid: req.query.uuid
         }).save();
         return setAndSendResponse(res, responseError.OK);
     } else {
